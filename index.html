@@ -157,7 +157,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="media-window full-height">
+                    <div class="media-window full-height" id="music-media-window">
                         <div class="media-list" id="all-audio-list">
                             <div class="media-item">
                                 <span class="icon">🎵</span>
@@ -304,6 +304,20 @@
             </div>
         </div>
 
+        <!-- МИНИ-ПЛЕЕР (появляется только при воспроизведении) -->
+        <div id="mini-player" class="mini-player hidden">
+            <div class="mini-player-content">
+                <div class="mini-player-info">
+                    <span class="mini-player-icon" id="mini-icon">🎵</span>
+                    <span class="mini-player-track" id="mini-track-name">трек.mp3</span>
+                </div>
+                <div class="mini-player-controls">
+                    <button id="mini-play-pause" class="mini-btn">▶</button>
+                    <span class="mini-time" id="mini-time">0:00 / 0:00</span>
+                </div>
+            </div>
+        </div>
+
         <!-- МОДАЛКА РЕДАКТИРОВАНИЯ -->
         <div id="edit-tabs-modal" class="modal">
             <div class="modal-content">
@@ -340,7 +354,7 @@
             </div>
         </div>
 
-        <!-- ПЛЕЕР -->
+        <!-- ПОЛНОЭКРАННЫЙ ПЛЕЕР -->
         <div id="player-screen" style="display: none;">
             <video id="video-player" controls style="width:100%; height:100%;"></video>
             <audio id="audio-player" controls style="display: none;"></audio>
