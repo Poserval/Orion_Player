@@ -58,20 +58,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Переключение между вкладками
     tabItems.forEach(tab => {
         tab.addEventListener('click', () => {
-            // Убираем активный класс у всех вкладок
             tabItems.forEach(t => t.classList.remove('active-tab'));
-            // Добавляем активный класс текущей вкладке
             tab.classList.add('active-tab');
             
-            // Получаем id контента
             const tabName = tab.getAttribute('data-tab');
             
-            // Скрываем все панели
             document.querySelectorAll('.tab-pane').forEach(pane => {
                 pane.classList.remove('active-pane');
             });
             
-            // Показываем нужную панель
             const activePane = document.getElementById(`tab-${tabName}`);
             if (activePane) {
                 activePane.classList.add('active-pane');
@@ -82,15 +77,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Открытие модалки редактирования
     if (editTabsBtn) {
         editTabsBtn.addEventListener('click', () => {
-            // Собираем текущий порядок вкладок
             const tabs = Array.from(tabItems).map(tab => ({
                 name: tab.textContent,
                 dataTab: tab.getAttribute('data-tab')
             }));
             
-            // Отрисовываем список для редактирования
             renderEditTabsList(tabs);
-            
             editTabsModal.classList.add('active');
         });
     }
@@ -105,16 +97,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Сохранение порядка вкладок
     if (saveTabsBtn) {
         saveTabsBtn.addEventListener('click', () => {
-            // Собираем новый порядок из DOM
             const editItems = document.querySelectorAll('.edit-tab-item');
             const newOrder = Array.from(editItems).map(item => ({
                 name: item.querySelector('.tab-name').textContent,
                 dataTab: item.getAttribute('data-tab')
             }));
             
-            // Обновляем вкладки в новом порядке
             updateTabsOrder(newOrder);
-            
             editTabsModal.classList.remove('active');
         });
     }
@@ -134,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="tab-name">${tab.name}</span>
             `;
             
-            // Добавляем логику перетаскивания (drag & drop)
             item.setAttribute('draggable', 'true');
             
             item.addEventListener('dragstart', handleDragStart);
@@ -183,10 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция обновления порядка вкладок
     function updateTabsOrder(newOrder) {
-        // Очищаем контейнер с вкладками
         tabsScroll.innerHTML = '';
         
-        // Создаем вкладки в новом порядке
         newOrder.forEach(tab => {
             const tabElement = document.createElement('div');
             tabElement.className = 'tab-item';
@@ -196,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tabElement.setAttribute('data-tab', tab.dataTab);
             tabElement.textContent = tab.name;
             
-            // Добавляем обработчик клика
             tabElement.addEventListener('click', () => {
                 document.querySelectorAll('.tab-item:not(.edit-tab)').forEach(t => t.classList.remove('active-tab'));
                 tabElement.classList.add('active-tab');
@@ -212,7 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tabsScroll.appendChild(tabElement);
         });
         
-        // Добавляем кнопку редактирования в конец
         const editBtn = document.createElement('div');
         editBtn.className = 'tab-item edit-tab';
         editBtn.id = 'edit-tabs-btn';
@@ -228,34 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
         tabsScroll.appendChild(editBtn);
     }
 
-    // Заглушки для списка на главной
-    const mediaList = document.getElementById('media-list');
-    function renderMainList() {
-        if (!mediaList) return;
-        
-        const mockRecentFiles = [
-            { name: 'видео_20250313.mp4', type: 'video', icon: '🎬' },
-            { name: 'трек_вчера.mp3', type: 'audio', icon: '🎵' },
-            { name: 'книга_глава_3.mp3', type: 'audiobook', icon: '🎧' }
-        ];
-        
-        mediaList.innerHTML = '';
-        
-        mockRecentFiles.forEach(file => {
-            const item = document.createElement('div');
-            item.className = 'media-item';
-            item.innerHTML = `
-                <span class="icon">${file.icon}</span>
-                <span class="name">${file.name}</span>
-            `;
-            
-            item.addEventListener('click', () => {
-                playMedia(file);
-            });
-            
-            mediaList.appendChild(item);
-        });
-    }
+    // ========== УБИРАЕМ ЗАГЛУШКУ, КОТОРАЯ ПЕРЕЗАПИСЫВАЕТ СПИСОК ==========
+    // Функция renderMainList ПОЛНОСТЬЮ УДАЛЕНА
+    // Теперь файлы из index.html остаются как есть
 
     // Плеер
     function playMedia(file) {
@@ -340,6 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Старт
-    renderMainList();
+    // ========== СТАРТ ==========
+    // Убрали вызов renderMainList() - теперь ничего не перезаписывается
 });
