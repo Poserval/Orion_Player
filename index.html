@@ -58,12 +58,63 @@
 
         <!-- КОНТЕНТ -->
         <div class="content">
-            <!-- Иконка сверху -->
+            <!-- Иконка сверху (хедер) -->
             <div class="top-icon">
                 <img src="assets/images/icon-header.png" alt="Orion">
             </div>
 
-            <!-- Модалка ссылки (та же) -->
+            <!-- СЕТКА КНОПОК 2x2 -->
+            <div class="category-grid">
+                <div class="category-btn" data-category="music">
+                    <span>Музыка</span>
+                </div>
+                <div class="category-btn" data-category="video">
+                    <span>Видео</span>
+                </div>
+                <div class="category-btn" data-category="images">
+                    <span>Изображения</span>
+                </div>
+                <div class="category-btn" data-category="audiobooks">
+                    <span>Аудиокниги</span>
+                </div>
+            </div>
+
+            <!-- СКРОЛЛИМАЯ ПАНЕЛЬ С ФАЙЛАМИ -->
+            <div class="recent-files">
+                <div class="recent-header">
+                    <span class="recent-title">Последние добавленные</span>
+                    <span class="recent-badge">за сутки</span>
+                </div>
+                <div class="recent-list" id="recent-list">
+                    <!-- Заглушки -->
+                    <div class="recent-item">
+                        <span class="icon">🎬</span>
+                        <span class="name">видео_20250313.mp4</span>
+                    </div>
+                    <div class="recent-item">
+                        <span class="icon">🎵</span>
+                        <span class="name">трек_вчера.mp3</span>
+                    </div>
+                    <div class="recent-item">
+                        <span class="icon">🎧</span>
+                        <span class="name">книга_глава_3.mp3</span>
+                    </div>
+                    <div class="recent-item">
+                        <span class="icon">🎬</span>
+                        <span class="name">видос_с_работы.mp4</span>
+                    </div>
+                    <div class="recent-item">
+                        <span class="icon">🎵</span>
+                        <span class="name">новый_трек.flac</span>
+                    </div>
+                    <div class="recent-item">
+                        <span class="icon">🎬</span>
+                        <span class="name">фильм_до_конца.mp4</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Модалка ссылки -->
             <div id="link-modal" class="modal">
                 <div class="modal-content">
                     <h3>Вставьте ссылку</h3>
@@ -73,22 +124,6 @@
                         <button id="close-modal-btn">Отмена</button>
                     </div>
                 </div>
-            </div>
-
-            <!-- Хлебные крошки -->
-            <div class="breadcrumbs" id="breadcrumbs">
-                <span class="location">/storage/emulated/0</span>
-            </div>
-
-            <!-- Список файлов -->
-            <div class="file-list" id="file-list">
-                <!-- Заглушки -->
-                <div class="folder-item"><span class="icon">📁</span><span class="name">Movies</span></div>
-                <div class="folder-item"><span class="icon">📁</span><span class="name">Music</span></div>
-                <div class="folder-item"><span class="icon">📁</span><span class="name">Audiobooks</span></div>
-                <div class="file-item"><span class="icon">🎬</span><span class="name">big_buck_bunny.mp4</span></div>
-                <div class="file-item"><span class="icon">🎵</span><span class="name">ambient_sound.mp3</span></div>
-                <div class="file-item"><span class="icon">🎧</span><span class="name">war_and_peace.mp3</span></div>
             </div>
         </div>
 
