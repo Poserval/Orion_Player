@@ -123,6 +123,8 @@ body {
 .section-divider {
     width: 100%;
     padding: 4px 16px 8px 16px;
+    display: flex;
+    justify-content: center;  /* центрирование по горизонтали */
 }
 
 .divider-text {
@@ -132,6 +134,7 @@ body {
     letter-spacing: 0.5px;
     text-transform: uppercase;
     opacity: 0.8;
+    text-align: center;  /* текст внутри тоже по центру */
 }
 
 /* ========== БОЛЬШОЕ ОКНО С МЕДИАФАЙЛАМИ ========== */
