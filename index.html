@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- ЗАСТАВКА (2-3 секунды) -->
+    <!-- ЗАСТАВКА (ПОВЕРХ ВСЕГО) -->
     <div id="splash-screen">
         <svg class="orion-splash" viewBox="0 0 200 100" preserveAspectRatio="xMidYMid meet">
             <!-- Звёзды -->
@@ -33,30 +33,29 @@
         </svg>
     </div>
 
+    <!-- ФОНОВОЕ СОЗВЕЗДИЕ (ПОД ВСЕМ) -->
+    <div class="background-constellation">
+        <svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid meet">
+            <circle cx="50" cy="30" r="3" fill="rgba(255,255,255,0.2)"/>
+            <circle cx="90" cy="20" r="4" fill="rgba(255,255,255,0.2)"/>
+            <circle cx="130" cy="25" r="3.5" fill="rgba(255,255,255,0.2)"/>
+            <circle cx="160" cy="40" r="3" fill="rgba(255,255,255,0.2)"/>
+            <circle cx="120" cy="55" r="3.2" fill="rgba(255,255,255,0.2)"/>
+            <circle cx="80" cy="65" r="4.5" fill="rgba(255,255,255,0.2)"/>
+            <circle cx="40" cy="70" r="3" fill="rgba(255,255,255,0.2)"/>
+            
+            <line x1="50" y1="30" x2="90" y2="20" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+            <line x1="90" y1="20" x2="130" y2="25" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+            <line x1="130" y1="25" x2="160" y2="40" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+            <line x1="160" y1="40" x2="120" y2="55" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+            <line x1="120" y1="55" x2="80" y2="65" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+            <line x1="80" y1="65" x2="40" y2="70" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+            <line x1="90" y1="20" x2="80" y2="65" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+        </svg>
+    </div>
+
     <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <div id="app">
-        <!-- Фоновое созвездие (приглушённое) -->
-        <div class="background-constellation">
-            <svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid meet">
-                <circle cx="50" cy="30" r="3" fill="rgba(255,255,255,0.2)"/>
-                <circle cx="90" cy="20" r="4" fill="rgba(255,255,255,0.2)"/>
-                <circle cx="130" cy="25" r="3.5" fill="rgba(255,255,255,0.2)"/>
-                <circle cx="160" cy="40" r="3" fill="rgba(255,255,255,0.2)"/>
-                <circle cx="120" cy="55" r="3.2" fill="rgba(255,255,255,0.2)"/>
-                <circle cx="80" cy="65" r="4.5" fill="rgba(255,255,255,0.2)"/>
-                <circle cx="40" cy="70" r="3" fill="rgba(255,255,255,0.2)"/>
-                
-                <line x1="50" y1="30" x2="90" y2="20" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                <line x1="90" y1="20" x2="130" y2="25" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                <line x1="130" y1="25" x2="160" y2="40" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                <line x1="160" y1="40" x2="120" y2="55" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                <line x1="120" y1="55" x2="80" y2="65" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                <line x1="80" y1="65" x2="40" y2="70" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                <line x1="90" y1="20" x2="80" y2="65" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-            </svg>
-        </div>
-
-        <!-- КОНТЕНТ -->
         <div class="content">
             <!-- Иконка сверху (хедер) -->
             <div class="top-icon">
