@@ -52,7 +52,7 @@ body {
 .bg-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;  /* чтобы покрывало весь фон */
+    object-fit: cover;
     opacity: 0.3;
 }
 
@@ -133,7 +133,7 @@ body {
     backdrop-filter: blur(4px);
     border-radius: 20px 20px 0 0;
     padding: 12px 0 0 0;
-    margin-top: auto;
+    margin-top: 16px;  /* такой же отступ, как между кнопками (gap: 16px) */
 }
 
 .recent-header {
@@ -148,14 +148,6 @@ body {
     font-size: 16px;
     font-weight: 600;
     color: #b0c8f0;
-}
-
-.recent-badge {
-    font-size: 12px;
-    color: #8098c0;
-    background: rgba(30, 40, 60, 0.6);
-    padding: 4px 8px;
-    border-radius: 30px;
 }
 
 .recent-list {
