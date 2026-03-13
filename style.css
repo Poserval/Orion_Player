@@ -89,9 +89,6 @@ body {
     gap: 16px;
     padding: 8px 0 16px 0;
     flex-shrink: 0;
-    height: 75vh;
-    max-height: 75vh;
-    align-content: start;
 }
 
 .category-btn {
@@ -122,62 +119,49 @@ body {
     transform: scale(0.98);
 }
 
-/* ========== СКРОЛЛИМАЯ ПАНЕЛЬ ========== */
-.recent-files {
-    flex-shrink: 0;
-    height: 25vh;
-    max-height: 25vh;
-    display: flex;
-    flex-direction: column;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(4px);
-    border-radius: 20px 20px 0 0;
-    padding: 12px 0 0 0;
-    margin-top: 16px;  /* такой же отступ, как между кнопками (gap: 16px) */
-}
-
-.recent-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px 8px 16px;
-    border-bottom: 1px solid rgba(100, 130, 170, 0.3);
-}
-
-.recent-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #b0c8f0;
-}
-
-.recent-list {
+/* ========== БОЛЬШОЕ ОКНО С МЕДИАФАЙЛАМИ ========== */
+.media-window {
     flex: 1;
-    overflow-y: auto;
-    padding: 8px 4px 12px 12px;
+    width: 100%;
+    background: rgba(10, 15, 25, 0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 24px 24px 0 0;
+    margin-top: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(100, 130, 170, 0.2);
+    border-bottom: none;
 }
 
-.recent-item {
+.media-list {
+    height: 100%;
+    overflow-y: auto;
+    padding: 12px 8px;
+}
+
+.media-item {
     display: flex;
     align-items: center;
-    padding: 10px 12px;
+    padding: 14px 16px;
     border-bottom: 1px solid rgba(80, 100, 130, 0.2);
     cursor: pointer;
+    transition: background 0.1s;
 }
 
-.recent-item:active {
-    background: rgba(40, 60, 90, 0.4);
-    border-radius: 12px;
+.media-item:active {
+    background: rgba(40, 60, 90, 0.5);
+    border-radius: 16px;
 }
 
-.recent-item .icon {
-    width: 32px;
-    font-size: 20px;
-    margin-right: 12px;
+.media-item .icon {
+    width: 40px;
+    font-size: 24px;
+    margin-right: 16px;
+    text-align: center;
 }
 
-.recent-item .name {
-    font-size: 15px;
-    color: #d0e0f5;
+.media-item .name {
+    font-size: 16px;
+    color: #e0e8ff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
