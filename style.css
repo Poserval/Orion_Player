@@ -119,6 +119,21 @@ body {
     transform: scale(0.98);
 }
 
+/* ========== РАЗДЕЛИТЕЛЬ С НАДПИСЬЮ ========== */
+.section-divider {
+    width: 100%;
+    padding: 4px 16px 8px 16px;
+}
+
+.divider-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #a0b8e0;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
 /* ========== БОЛЬШОЕ ОКНО С МЕДИАФАЙЛАМИ ========== */
 .media-window {
     flex: 1;
@@ -126,10 +141,10 @@ body {
     background: rgba(10, 15, 25, 0.6);
     backdrop-filter: blur(8px);
     border-radius: 24px 24px 0 0;
-    margin-top: 8px;
     overflow: hidden;
     border: 1px solid rgba(100, 130, 170, 0.2);
     border-bottom: none;
+    margin-bottom: 0;
 }
 
 .media-list {
