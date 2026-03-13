@@ -1,0 +1,255 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0c10;
+    color: #fff;
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* ЗАСТАВКА */
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #030405;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease;
+}
+
+.orion-splash {
+    width: 80%;
+    max-width: 400px;
+}
+
+.star {
+    animation: twinkle 2s infinite ease-in-out;
+}
+
+.star-1 { animation-delay: 0s; }
+.star-2 { animation-delay: 0.4s; }
+.star-3 { animation-delay: 0.8s; }
+.star-4 { animation-delay: 1.2s; }
+.star-5 { animation-delay: 1.6s; }
+.star-6 { animation-delay: 2s; }
+.star-7 { animation-delay: 2.4s; }
+
+@keyframes twinkle {
+    0%, 100% { opacity: 1; r: 4; }
+    50% { opacity: 0.3; r: 2; }
+}
+
+/* ФОН */
+.background-constellation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.background-constellation svg {
+    width: 90%;
+    max-width: 600px;
+    height: auto;
+}
+
+/* КОНТЕНТ */
+.content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    padding: 20px 16px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1e1e2e;
+    background: rgba(10,12,16,0.8);
+    backdrop-filter: blur(5px);
+}
+
+.header h1 {
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: #a8b9d8;
+}
+
+.btn-link {
+    background: none;
+    border: 1px solid #3e4a5e;
+    color: #a8b9d8;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-link:active {
+    background: #1e2a3a;
+}
+
+.breadcrumbs {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: #6a7a8e;
+    border-bottom: 1px solid #1a1c24;
+    background: rgba(10,12,16,0.6);
+    backdrop-filter: blur(5px);
+}
+
+.file-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+}
+
+.folder-item, .file-item {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #1a1c24;
+    cursor: pointer;
+}
+
+.folder-item:active, .file-item:active {
+    background: #1e2128;
+}
+
+.icon {
+    width: 36px;
+    font-size: 22px;
+    text-align: center;
+    margin-right: 12px;
+}
+
+.name {
+    font-size: 16px;
+    color: #e0e5ee;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* МОДАЛКА */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 500;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #14181f;
+    width: 90%;
+    max-width: 400px;
+    padding: 24px;
+    border-radius: 16px;
+}
+
+.modal-content h3 {
+    margin-bottom: 16px;
+    color: #b7c4d9;
+    font-weight: 400;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 14px;
+    background: #1e262f;
+    border: 1px solid #2e3a48;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#play-url-btn {
+    background: #3a4a5e;
+    color: white;
+}
+
+#close-modal-btn {
+    background: #1e262f;
+    color: #8f9bb3;
+}
+
+/* ПЛЕЕР */
+#player-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: 200;
+}
+
+#video-player {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.subtitle-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 20px;
+    z-index: 250;
+}
+
+#load-subtitle {
+    background: rgba(20,30,40,0.8);
+    backdrop-filter: blur(5px);
+    border: 1px solid #4a5e72;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 40px;
+    font-size: 16px;
+    cursor: pointer;
+}
