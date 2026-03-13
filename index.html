@@ -64,18 +64,6 @@
                             <span class="icon">🎧</span>
                             <span class="name">книга_глава_3.mp3</span>
                         </div>
-                        <div class="media-item">
-                            <span class="icon">🎬</span>
-                            <span class="name">видос_с_работы.mp4</span>
-                        </div>
-                        <div class="media-item">
-                            <span class="icon">🎵</span>
-                            <span class="name">новый_трек.flac</span>
-                        </div>
-                        <div class="media-item">
-                            <span class="icon">🎬</span>
-                            <span class="name">фильм_до_конца.mp4</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -84,48 +72,165 @@
         <!-- СТРАНИЦА 2 - МУЗЫКА -->
         <div id="page-music" class="page">
             <div class="content">
-                <!-- КНОПКА ВОЗВРАТА (справа под хедером) -->
+                <!-- КНОПКА ВОЗВРАТА И ЗАГОЛОВОК -->
                 <div class="page-header">
-                    <div class="header-left"></div> <!-- пустой div для баланса -->
+                    <div class="header-left"></div>
                     <div class="header-title">Музыка</div>
                     <div class="header-right">
                         <button id="back-to-main" class="back-btn">← Назад</button>
                     </div>
                 </div>
 
-                <!-- СПИСОК МУЗЫКИ (заглушка) -->
-                <div class="media-window full-height">
-                    <div class="media-list" id="music-list">
-                        <div class="media-item">
-                            <span class="icon">🎵</span>
-                            <span class="name">любимый_трек_1.mp3</span>
+                <!-- СКРОЛЛИМЫЕ ВКЛАДКИ -->
+                <div class="tabs-container">
+                    <div class="tabs-scroll" id="tabs-scroll">
+                        <div class="tab-item active-tab" data-tab="all">Все</div>
+                        <div class="tab-item" data-tab="folders">Папки</div>
+                        <div class="tab-item" data-tab="playlists">Плейлисты</div>
+                        <div class="tab-item" data-tab="albums">Альбомы</div>
+                        <div class="tab-item" data-tab="artists">Артист</div>
+                        <div class="tab-item" data-tab="genres">Жанры</div>
+                        <div class="tab-item edit-tab" id="edit-tabs-btn">✎</div>
+                    </div>
+                </div>
+
+                <!-- КОНТЕНТ ВКЛАДОК -->
+                <div class="tab-content">
+                    <!-- Вкладка "Все" (по умолчанию) -->
+                    <div class="tab-pane active-pane" id="tab-all">
+                        <div class="media-window full-height">
+                            <div class="media-list" id="all-audio-list">
+                                <div class="media-item">
+                                    <span class="icon">🎵</span>
+                                    <span class="name">трек_1.mp3</span>
+                                </div>
+                                <div class="media-item">
+                                    <span class="icon">🎵</span>
+                                    <span class="name">трек_2.flac</span>
+                                </div>
+                                <div class="media-item">
+                                    <span class="icon">🎵</span>
+                                    <span class="name">трек_3.wav</span>
+                                </div>
+                                <div class="media-item">
+                                    <span class="icon">🎵</span>
+                                    <span class="name">трек_4.aac</span>
+                                </div>
+                                <div class="media-item">
+                                    <span class="icon">🎵</span>
+                                    <span class="name">трек_5.ogg</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="media-item">
-                            <span class="icon">🎵</span>
-                            <span class="name">любимый_трек_2.mp3</span>
+                    </div>
+
+                    <!-- Вкладка "Папки" -->
+                    <div class="tab-pane" id="tab-folders">
+                        <div class="media-window full-height">
+                            <div class="media-list">
+                                <div class="folder-item">
+                                    <span class="icon">📁</span>
+                                    <span class="name">Музыка</span>
+                                </div>
+                                <div class="folder-item">
+                                    <span class="icon">📁</span>
+                                    <span class="name">Подкасты</span>
+                                </div>
+                                <div class="folder-item">
+                                    <span class="icon">📁</span>
+                                    <span class="name">Записи</span>
+                                </div>
+                                <div class="folder-item">
+                                    <span class="icon">📁</span>
+                                    <span class="name">Аудиокниги</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="media-item">
-                            <span class="icon">🎵</span>
-                            <span class="name">альбом_2024_трек_3.mp3</span>
+                    </div>
+
+                    <!-- Вкладка "Плейлисты" (пустая) -->
+                    <div class="tab-pane" id="tab-playlists">
+                        <div class="empty-state">
+                            <span class="empty-icon">📋</span>
+                            <span class="empty-text">Нет плейлистов</span>
+                            <span class="empty-hint">Создайте новый плейлист</span>
                         </div>
-                        <div class="media-item">
-                            <span class="icon">🎵</span>
-                            <span class="name">подкаст_выпуск_5.mp3</span>
+                    </div>
+
+                    <!-- Вкладка "Альбомы" (заглушка) -->
+                    <div class="tab-pane" id="tab-albums">
+                        <div class="media-window full-height">
+                            <div class="media-list">
+                                <div class="media-item">
+                                    <span class="icon">💿</span>
+                                    <span class="name">Альбом 2024</span>
+                                </div>
+                                <div class="media-item">
+                                    <span class="icon">💿</span>
+                                    <span class="name">Сборник хитов</span>
+                                </div>
+                                <div class="media-item">
+                                    <span class="icon">💿</span>
+                                    <span class="name">Классика</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="media-item">
-                            <span class="icon">🎵</span>
-                            <span class="name">классика_моцарт.mp3</span>
+                    </div>
+
+                    <!-- Вкладка "Артист" (заглушка) -->
+                    <div class="tab-pane" id="tab-artists">
+                        <div class="media-window full-height">
+                            <div class="media-list">
+                                <div class="media-item">
+                                    <span class="icon">👤</span>
+                                    <span class="name">Исполнитель 1</span>
+                                </div>
+                                <div class="media-item">
+                                    <span class="icon">👤</span>
+                                    <span class="name">Исполнитель 2</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="media-item">
-                            <span class="icon">🎵</span>
-                            <span class="name">рок_хит_2000.mp3</span>
+                    </div>
+
+                    <!-- Вкладка "Жанры" (заглушка) -->
+                    <div class="tab-pane" id="tab-genres">
+                        <div class="media-window full-height">
+                            <div class="media-list">
+                                <div class="media-item">
+                                    <span class="icon">🎸</span>
+                                    <span class="name">Рок</span>
+                                </div>
+                                <div class="media-item">
+                                    <span class="icon">🎹</span>
+                                    <span class="name">Классика</span>
+                                </div>
+                                <div class="media-item">
+                                    <span class="icon">🎤</span>
+                                    <span class="name">Поп</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Модалка ссылки (доступна с любой страницы) -->
+        <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ВКЛАДОК -->
+        <div id="edit-tabs-modal" class="modal">
+            <div class="modal-content">
+                <h3>Редактировать вкладки</h3>
+                <div class="edit-tabs-list" id="edit-tabs-list">
+                    <!-- Сюда будут добавляться пункты для перетаскивания -->
+                </div>
+                <div class="modal-buttons">
+                    <button id="save-tabs-btn">Готово</button>
+                    <button id="close-edit-modal-btn">Отмена</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модалка ссылки -->
         <div id="link-modal" class="modal">
             <div class="modal-content">
                 <h3>Вставьте ссылку</h3>
