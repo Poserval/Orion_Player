@@ -1,3 +1,28 @@
+/* ИКОНКА СВЕРХУ */
+.top-icon {
+    width: 100%;
+    text-align: center;
+    padding: 8px 0 4px 0;
+    margin-top: 0;  /* прижато к самому верху */
+    background: transparent;
+}
+
+.top-icon img {
+    width: 120px;  /* размер подгонишь потом */
+    height: auto;
+    display: inline-block;
+}
+
+/* ХЛЕБНЫЕ КРОШКИ (чуть отодвинуть от иконки) */
+.breadcrumbs {
+    padding: 8px 16px 12px 16px;
+    font-size: 14px;
+    color: #6a7a8e;
+    border-bottom: 1px solid #1a1c24;
+    background: rgba(10,12,16,0.6);
+    backdrop-filter: blur(5px);
+}
+
 * {
     margin: 0;
     padding: 0;
