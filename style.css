@@ -12,7 +12,7 @@ body {
     height: 100vh;
 }
 
-/* ========== ЗАСТАВКА ========== */
+/* ========== ЗАСТАВКА (orion_splash.png) ========== */
 #splash-screen {
     position: fixed;
     top: 0;
@@ -27,29 +27,14 @@ body {
     transition: opacity 0.5s ease;
 }
 
-.orion-splash {
+.splash-image {
     width: 80%;
-    max-width: 400px;
+    max-width: 500px;
+    height: auto;
+    object-fit: contain;
 }
 
-.star {
-    animation: twinkle 2s infinite ease-in-out;
-}
-
-.star-1 { animation-delay: 0s; }
-.star-2 { animation-delay: 0.4s; }
-.star-3 { animation-delay: 0.8s; }
-.star-4 { animation-delay: 1.2s; }
-.star-5 { animation-delay: 1.6s; }
-.star-6 { animation-delay: 2s; }
-.star-7 { animation-delay: 2.4s; }
-
-@keyframes twinkle {
-    0%, 100% { opacity: 1; r: 4; }
-    50% { opacity: 0.3; r: 2; }
-}
-
-/* ========== ФОН (приглушённое созвездие) ========== */
+/* ========== ФОН (orion_bg.png) ========== */
 .background-constellation {
     position: fixed;
     top: 0;
@@ -64,10 +49,11 @@ body {
     z-index: 0;
 }
 
-.background-constellation svg {
-    width: 90%;
-    max-width: 600px;
-    height: auto;
+.bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* чтобы покрывало весь фон */
+    opacity: 0.3;
 }
 
 /* ========== ОСНОВНОЙ КОНТЕНТ ========== */
@@ -80,7 +66,7 @@ body {
     padding: 0 12px;
 }
 
-/* ========== ИКОНКА СВЕРХУ (ХЕДЕР) ========== */
+/* ========== ИКОНКА СВЕРХУ ========== */
 .top-icon {
     width: 100%;
     text-align: center;
@@ -96,14 +82,14 @@ body {
     display: inline-block;
 }
 
-/* ========== СЕТКА КНОПОК 2x2 (75% высоты) ========== */
+/* ========== СЕТКА КНОПОК 2x2 ========== */
 .category-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     padding: 8px 0 16px 0;
     flex-shrink: 0;
-    height: 75vh;  /* занимает 75% высоты */
+    height: 75vh;
     max-height: 75vh;
     align-content: start;
 }
@@ -123,7 +109,7 @@ body {
     color: #d0e0ff;
     transition: all 0.2s;
     cursor: pointer;
-    aspect-ratio: 1 / 0.8;  /* чуть приплюснутые, как кнопки */
+    aspect-ratio: 1 / 0.8;
 }
 
 .category-btn span {
@@ -136,7 +122,7 @@ body {
     transform: scale(0.98);
 }
 
-/* ========== СКРОЛЛИМАЯ ПАНЕЛЬ (25% высоты) ========== */
+/* ========== СКРОЛЛИМАЯ ПАНЕЛЬ ========== */
 .recent-files {
     flex-shrink: 0;
     height: 25vh;
@@ -147,7 +133,7 @@ body {
     backdrop-filter: blur(4px);
     border-radius: 20px 20px 0 0;
     padding: 12px 0 0 0;
-    margin-top: auto;  /* прижимаем к низу */
+    margin-top: auto;
 }
 
 .recent-header {
@@ -294,7 +280,7 @@ body {
     height: 100%;
 }
 
-/* ========== КНОПКА СУБТИТРОВ ========== */
+/* ========== СУБТИТРЫ ========== */
 .subtitle-btn {
     position: fixed;
     bottom: 30px;
