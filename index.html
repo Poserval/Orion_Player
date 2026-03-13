@@ -19,89 +19,120 @@
 
     <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <div id="app">
-        <div class="content">
-            <!-- Иконка сверху -->
-            <div class="top-icon">
-                <img src="assets/images/icon-header.png" alt="Orion">
-            </div>
+        <!-- ХЕДЕР (ОДИН НА ВСЕ СТРАНИЦЫ) -->
+        <div class="top-icon">
+            <img src="assets/images/icon-header.png" alt="Orion">
+        </div>
 
-            <!-- СЕТКА КНОПОК 2x2 -->
-            <div class="category-grid">
-                <div class="category-btn" data-category="music">
-                    <span>Музыка</span>
+        <!-- СТРАНИЦА 1 - ГЛАВНАЯ -->
+        <div id="page-main" class="page active-page">
+            <div class="content">
+                <!-- СЕТКА КНОПОК 2x2 -->
+                <div class="category-grid">
+                    <div class="category-btn" data-category="music" id="music-btn">
+                        <span>Музыка</span>
+                    </div>
+                    <div class="category-btn" data-category="video">
+                        <span>Видео</span>
+                    </div>
+                    <div class="category-btn" data-category="images">
+                        <span>Изображения</span>
+                    </div>
+                    <div class="category-btn" data-category="audiobooks">
+                        <span>Аудиокниги</span>
+                    </div>
                 </div>
-                <div class="category-btn" data-category="video">
-                    <span>Видео</span>
-                </div>
-                <div class="category-btn" data-category="images">
-                    <span>Изображения</span>
-                </div>
-                <div class="category-btn" data-category="audiobooks">
-                    <span>Аудиокниги</span>
-                </div>
-            </div>
 
-            <!-- РАЗДЕЛИТЕЛЬ - НАДПИСЬ НЕДАВНО ДОБАВЛЕННЫЕ -->
-            <div class="section-divider">
-                <span class="divider-text">Недавно добавленные</span>
-            </div>
+                <!-- РАЗДЕЛИТЕЛЬ - НАДПИСЬ НЕДАВНО ДОБАВЛЕННЫЕ -->
+                <div class="section-divider">
+                    <span class="divider-text">Недавно добавленные</span>
+                </div>
 
-            <!-- БОЛЬШОЕ ОКНО С МЕДИАФАЙЛАМИ -->
-            <div class="media-window">
-                <div class="media-list" id="media-list">
-                    <!-- Заглушки файлов -->
-                    <div class="media-item">
-                        <span class="icon">🎬</span>
-                        <span class="name">видео_20250313.mp4</span>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎵</span>
-                        <span class="name">трек_вчера.mp3</span>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎧</span>
-                        <span class="name">книга_глава_3.mp3</span>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎬</span>
-                        <span class="name">видос_с_работы.mp4</span>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎵</span>
-                        <span class="name">новый_трек.flac</span>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎬</span>
-                        <span class="name">фильм_до_конца.mp4</span>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎵</span>
-                        <span class="name">ещё_один_трек.mp3</span>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎬</span>
-                        <span class="name">клип_на_памяти.mp4</span>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎧</span>
-                        <span class="name">аудиокнига_том_1.mp3</span>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎬</span>
-                        <span class="name">запись_стрима.mp4</span>
+                <!-- БОЛЬШОЕ ОКНО С МЕДИАФАЙЛАМИ -->
+                <div class="media-window">
+                    <div class="media-list" id="media-list">
+                        <!-- Заглушки файлов -->
+                        <div class="media-item">
+                            <span class="icon">🎬</span>
+                            <span class="name">видео_20250313.mp4</span>
+                        </div>
+                        <div class="media-item">
+                            <span class="icon">🎵</span>
+                            <span class="name">трек_вчера.mp3</span>
+                        </div>
+                        <div class="media-item">
+                            <span class="icon">🎧</span>
+                            <span class="name">книга_глава_3.mp3</span>
+                        </div>
+                        <div class="media-item">
+                            <span class="icon">🎬</span>
+                            <span class="name">видос_с_работы.mp4</span>
+                        </div>
+                        <div class="media-item">
+                            <span class="icon">🎵</span>
+                            <span class="name">новый_трек.flac</span>
+                        </div>
+                        <div class="media-item">
+                            <span class="icon">🎬</span>
+                            <span class="name">фильм_до_конца.mp4</span>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Модалка ссылки -->
-            <div id="link-modal" class="modal">
-                <div class="modal-content">
-                    <h3>Вставьте ссылку</h3>
-                    <input type="url" id="url-input" placeholder="https://...">
-                    <div class="modal-buttons">
-                        <button id="play-url-btn">Играть</button>
-                        <button id="close-modal-btn">Отмена</button>
+        <!-- СТРАНИЦА 2 - МУЗЫКА -->
+        <div id="page-music" class="page">
+            <div class="content">
+                <!-- КНОПКА ВОЗВРАТА (справа под хедером) -->
+                <div class="page-header">
+                    <div class="header-left"></div> <!-- пустой div для баланса -->
+                    <div class="header-title">Музыка</div>
+                    <div class="header-right">
+                        <button id="back-to-main" class="back-btn">← Назад</button>
                     </div>
+                </div>
+
+                <!-- СПИСОК МУЗЫКИ (заглушка) -->
+                <div class="media-window full-height">
+                    <div class="media-list" id="music-list">
+                        <div class="media-item">
+                            <span class="icon">🎵</span>
+                            <span class="name">любимый_трек_1.mp3</span>
+                        </div>
+                        <div class="media-item">
+                            <span class="icon">🎵</span>
+                            <span class="name">любимый_трек_2.mp3</span>
+                        </div>
+                        <div class="media-item">
+                            <span class="icon">🎵</span>
+                            <span class="name">альбом_2024_трек_3.mp3</span>
+                        </div>
+                        <div class="media-item">
+                            <span class="icon">🎵</span>
+                            <span class="name">подкаст_выпуск_5.mp3</span>
+                        </div>
+                        <div class="media-item">
+                            <span class="icon">🎵</span>
+                            <span class="name">классика_моцарт.mp3</span>
+                        </div>
+                        <div class="media-item">
+                            <span class="icon">🎵</span>
+                            <span class="name">рок_хит_2000.mp3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модалка ссылки (доступна с любой страницы) -->
+        <div id="link-modal" class="modal">
+            <div class="modal-content">
+                <h3>Вставьте ссылку</h3>
+                <input type="url" id="url-input" placeholder="https://...">
+                <div class="modal-buttons">
+                    <button id="play-url-btn">Играть</button>
+                    <button id="close-modal-btn">Отмена</button>
                 </div>
             </div>
         </div>
