@@ -20,6 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const musicBtn = document.getElementById('music-btn');
     const backToMain = document.getElementById('back-to-main');
 
+    // Элементы вкладок
+    const tabItems = document.querySelectorAll('.tab-item:not(.edit-tab)');
+    const editTabsBtn = document.getElementById('edit-tabs-btn');
+    const editTabsModal = document.getElementById('edit-tabs-modal');
+    const closeEditModalBtn = document.getElementById('close-edit-modal-btn');
+    const saveTabsBtn = document.getElementById('save-tabs-btn');
+    const editTabsList = document.getElementById('edit-tabs-list');
+    const tabsScroll = document.getElementById('tabs-scroll');
+
     // Заставка 5 секунд
     setTimeout(() => {
         splash.style.opacity = '0';
@@ -44,20 +53,191 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Заглушки для списка (временные данные)
-    const mockRecentFiles = [
-        { name: 'видео_20250313.mp4', type: 'video', icon: '🎬' },
-        { name: 'трек_вчера.mp3', type: 'audio', icon: '🎵' },
-        { name: 'книга_глава_3.mp3', type: 'audiobook', icon: '🎧' },
-        { name: 'видос_с_работы.mp4', type: 'video', icon: '🎬' },
-        { name: 'новый_трек.flac', type: 'audio', icon: '🎵' },
-        { name: 'фильм_до_конца.mp4', type: 'video', icon: '🎬' }
-    ];
+    // ========== ЛОГИКА ВКЛАДОК ==========
+    
+    // Переключение между вкладками
+    tabItems.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Убираем активный класс у всех вкладок
+            tabItems.forEach(t => t.classList.remove('active-tab'));
+            // Добавляем активный класс текущей вкладке
+            tab.classList.add('active-tab');
+            
+            // Получаем id контента
+            const tabName = tab.getAttribute('data-tab');
+            
+            // Скрываем все панели
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active-pane');
+            });
+            
+            // Показываем нужную панель
+            const activePane = document.getElementById(`tab-${tabName}`);
+            if (activePane) {
+                activePane.classList.add('active-pane');
+            }
+        });
+    });
 
-    // Заполняем список файлов на главной
+    // Открытие модалки редактирования
+    if (editTabsBtn) {
+        editTabsBtn.addEventListener('click', () => {
+            // Собираем текущий порядок вкладок
+            const tabs = Array.from(tabItems).map(tab => ({
+                name: tab.textContent,
+                dataTab: tab.getAttribute('data-tab')
+            }));
+            
+            // Отрисовываем список для редактирования
+            renderEditTabsList(tabs);
+            
+            editTabsModal.classList.add('active');
+        });
+    }
+
+    // Закрытие модалки редактирования
+    if (closeEditModalBtn) {
+        closeEditModalBtn.addEventListener('click', () => {
+            editTabsModal.classList.remove('active');
+        });
+    }
+
+    // Сохранение порядка вкладок
+    if (saveTabsBtn) {
+        saveTabsBtn.addEventListener('click', () => {
+            // Собираем новый порядок из DOM
+            const editItems = document.querySelectorAll('.edit-tab-item');
+            const newOrder = Array.from(editItems).map(item => ({
+                name: item.querySelector('.tab-name').textContent,
+                dataTab: item.getAttribute('data-tab')
+            }));
+            
+            // Обновляем вкладки в новом порядке
+            updateTabsOrder(newOrder);
+            
+            editTabsModal.classList.remove('active');
+        });
+    }
+
+    // Функция отрисовки списка редактирования
+    function renderEditTabsList(tabs) {
+        if (!editTabsList) return;
+        
+        editTabsList.innerHTML = '';
+        
+        tabs.forEach(tab => {
+            const item = document.createElement('div');
+            item.className = 'edit-tab-item';
+            item.setAttribute('data-tab', tab.dataTab);
+            item.innerHTML = `
+                <span class="drag-handle">⋮⋮</span>
+                <span class="tab-name">${tab.name}</span>
+            `;
+            
+            // Добавляем логику перетаскивания (drag & drop)
+            item.setAttribute('draggable', 'true');
+            
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('drop', handleDrop);
+            item.addEventListener('dragend', handleDragEnd);
+            
+            editTabsList.appendChild(item);
+        });
+    }
+
+    // Переменные для drag & drop
+    let dragStartIndex;
+
+    function handleDragStart(e) {
+        dragStartIndex = Array.from(editTabsList.children).indexOf(this);
+        this.style.opacity = '0.5';
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const dragEndIndex = Array.from(editTabsList.children).indexOf(this);
+        
+        if (dragStartIndex !== dragEndIndex) {
+            const items = Array.from(editTabsList.children);
+            const dragItem = items[dragStartIndex];
+            const dropItem = items[dragEndIndex];
+            
+            if (dragStartIndex < dragEndIndex) {
+                dropItem.after(dragItem);
+            } else {
+                dropItem.before(dragItem);
+            }
+        }
+        
+        this.style.opacity = '';
+    }
+
+    function handleDragEnd(e) {
+        this.style.opacity = '';
+    }
+
+    // Функция обновления порядка вкладок
+    function updateTabsOrder(newOrder) {
+        // Очищаем контейнер с вкладками
+        tabsScroll.innerHTML = '';
+        
+        // Создаем вкладки в новом порядке
+        newOrder.forEach(tab => {
+            const tabElement = document.createElement('div');
+            tabElement.className = 'tab-item';
+            if (tab.dataTab === 'all') {
+                tabElement.classList.add('active-tab');
+            }
+            tabElement.setAttribute('data-tab', tab.dataTab);
+            tabElement.textContent = tab.name;
+            
+            // Добавляем обработчик клика
+            tabElement.addEventListener('click', () => {
+                document.querySelectorAll('.tab-item:not(.edit-tab)').forEach(t => t.classList.remove('active-tab'));
+                tabElement.classList.add('active-tab');
+                
+                const tabName = tabElement.getAttribute('data-tab');
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active-pane'));
+                const activePane = document.getElementById(`tab-${tabName}`);
+                if (activePane) {
+                    activePane.classList.add('active-pane');
+                }
+            });
+            
+            tabsScroll.appendChild(tabElement);
+        });
+        
+        // Добавляем кнопку редактирования в конец
+        const editBtn = document.createElement('div');
+        editBtn.className = 'tab-item edit-tab';
+        editBtn.id = 'edit-tabs-btn';
+        editBtn.textContent = '✎';
+        editBtn.addEventListener('click', () => {
+            const tabs = Array.from(document.querySelectorAll('.tab-item:not(.edit-tab)')).map(t => ({
+                name: t.textContent,
+                dataTab: t.getAttribute('data-tab')
+            }));
+            renderEditTabsList(tabs);
+            editTabsModal.classList.add('active');
+        });
+        tabsScroll.appendChild(editBtn);
+    }
+
+    // Заглушки для списка на главной
     const mediaList = document.getElementById('media-list');
     function renderMainList() {
         if (!mediaList) return;
+        
+        const mockRecentFiles = [
+            { name: 'видео_20250313.mp4', type: 'video', icon: '🎬' },
+            { name: 'трек_вчера.mp3', type: 'audio', icon: '🎵' },
+            { name: 'книга_глава_3.mp3', type: 'audiobook', icon: '🎧' }
+        ];
         
         mediaList.innerHTML = '';
         
@@ -85,13 +265,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (file.type === 'video') {
             videoPlayer.style.display = 'block';
             audioPlayer.style.display = 'none';
-            videoPlayer.src = '#'; // Заглушка
+            videoPlayer.src = '#';
             videoPlayer.play();
             subtitleBtn.style.display = 'block';
         } else {
             audioPlayer.style.display = 'block';
             videoPlayer.style.display = 'none';
-            audioPlayer.src = '#'; // Заглушка
+            audioPlayer.src = '#';
             audioPlayer.play();
             subtitleBtn.style.display = 'none';
         }
