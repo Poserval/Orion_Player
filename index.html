@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Orion Player</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ЯРКАЯ ЗАСТАВКА -->
+    <div id="splash-screen">
+        <svg class="orion-splash" viewBox="0 0 200 100" preserveAspectRatio="xMidYMid meet">
+            <!-- Звёзды -->
+            <circle cx="50" cy="30" r="4" fill="white" class="star star-1"/>
+            <circle cx="90" cy="20" r="5" fill="white" class="star star-2"/>
+            <circle cx="130" cy="25" r="4.5" fill="white" class="star star-3"/>
+            <circle cx="160" cy="40" r="4" fill="white" class="star star-4"/>
+            <circle cx="120" cy="55" r="4.2" fill="white" class="star star-5"/>
+            <circle cx="80" cy="65" r="5.5" fill="white" class="star star-6"/>
+            <circle cx="40" cy="70" r="4" fill="white" class="star star-7"/>
+            
+            <!-- Линии -->
+            <line x1="50" y1="30" x2="90" y2="20" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <line x1="90" y1="20" x2="130" y2="25" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <line x1="130" y1="25" x2="160" y2="40" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <line x1="160" y1="40" x2="120" y2="55" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <line x1="120" y1="55" x2="80" y2="65" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <line x1="80" y1="65" x2="40" y2="70" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            <line x1="90" y1="20" x2="80" y2="65" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+            
+            <!-- Название -->
+            <text x="100" y="90" text-anchor="middle" fill="white" font-size="10" font-weight="bold" letter-spacing="2">ORION PLAYER</text>
+        </svg>
+    </div>
+
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
+    <div id="app">
+        <!-- Фоновое созвездие -->
+        <div class="background-constellation">
+            <svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid meet">
+                <circle cx="50" cy="30" r="3" fill="rgba(255,255,255,0.2)"/>
+                <circle cx="90" cy="20" r="4" fill="rgba(255,255,255,0.2)"/>
+                <circle cx="130" cy="25" r="3.5" fill="rgba(255,255,255,0.2)"/>
+                <circle cx="160" cy="40" r="3" fill="rgba(255,255,255,0.2)"/>
+                <circle cx="120" cy="55" r="3.2" fill="rgba(255,255,255,0.2)"/>
+                <circle cx="80" cy="65" r="4.5" fill="rgba(255,255,255,0.2)"/>
+                <circle cx="40" cy="70" r="3" fill="rgba(255,255,255,0.2)"/>
+                
+                <line x1="50" y1="30" x2="90" y2="20" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="90" y1="20" x2="130" y2="25" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="130" y1="25" x2="160" y2="40" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="160" y1="40" x2="120" y2="55" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="120" y1="55" x2="80" y2="65" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="80" y1="65" x2="40" y2="70" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+                <line x1="90" y1="20" x2="80" y2="65" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+            </svg>
+        </div>
+
+        <!-- КОНТЕНТ -->
+        <div class="content">
+            <div class="header">
+                <h1>ORION</h1>
+                <button id="add-link-btn" class="btn-link">+ Ссылка</button>
+            </div>
+
+            <div id="link-modal" class="modal">
+                <div class="modal-content">
+                    <h3>Вставьте ссылку</h3>
+                    <input type="url" id="url-input" placeholder="https://...">
+                    <div class="modal-buttons">
+                        <button id="play-url-btn">Играть</button>
+                        <button id="close-modal-btn">Отмена</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="breadcrumbs" id="breadcrumbs">
+                <span class="location">/storage/emulated/0</span>
+            </div>
+
+            <div class="file-list" id="file-list">
+                <!-- Заглушки -->
+                <div class="folder-item"><span class="icon">📁</span><span class="name">Movies</span></div>
+                <div class="folder-item"><span class="icon">📁</span><span class="name">Music</span></div>
+                <div class="folder-item"><span class="icon">📁</span><span class="name">Downloads</span></div>
+                <div class="file-item"><span class="icon">🎬</span><span class="name">big_buck_bunny.mp4</span></div>
+                <div class="file-item"><span class="icon">🎵</span><span class="name">ambient_sound.mp3</span></div>
+            </div>
+        </div>
+
+        <!-- ПЛЕЕР -->
+        <div id="player-screen" style="display: none;">
+            <video id="video-player" controls style="width:100%; height:100%;"></video>
+            <audio id="audio-player" controls style="display: none;"></audio>
+            <div class="subtitle-btn" id="subtitle-btn" style="display: none;">
+                <button id="load-subtitle">📄 Субтитры</button>
+                <input type="file" id="subtitle-file" accept=".srt" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
