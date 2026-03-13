@@ -23,8 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }, 5000);
 
-    // Заглушки для списка
-    const mockMediaItems = [
+    // Заглушки для списка (временные данные)
+    const mockRecentFiles = [
         { name: 'видео_20250313.mp4', type: 'video', icon: '🎬' },
         { name: 'трек_вчера.mp3', type: 'audio', icon: '🎵' },
         { name: 'книга_глава_3.mp3', type: 'audiobook', icon: '🎧' },
@@ -32,45 +32,50 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: 'новый_трек.flac', type: 'audio', icon: '🎵' },
         { name: 'фильм_до_конца.mp4', type: 'video', icon: '🎬' },
         { name: 'ещё_один_трек.mp3', type: 'audio', icon: '🎵' },
-        { name: 'клип.mp4', type: 'video', icon: '🎬' }
+        { name: 'клип_на_памяти.mp4', type: 'video', icon: '🎬' },
+        { name: 'аудиокнига_том_1.mp3', type: 'audiobook', icon: '🎧' },
+        { name: 'запись_стрима.mp4', type: 'video', icon: '🎬' }
     ];
 
-    // Заполняем список
+    // Заполняем список файлов
     function renderMediaList() {
         if (!mediaList) return;
         
         mediaList.innerHTML = '';
         
-        mockMediaItems.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'media-item';
-            div.innerHTML = `<span class="icon">${item.icon}</span><span class="name">${item.name}</span>`;
+        mockRecentFiles.forEach(file => {
+            const item = document.createElement('div');
+            item.className = 'media-item';
+            item.innerHTML = `
+                <span class="icon">${file.icon}</span>
+                <span class="name">${file.name}</span>
+            `;
             
-            div.addEventListener('click', () => {
-                playMedia({ type: item.type, path: '#', name: item.name });
+            item.addEventListener('click', () => {
+                playMedia(file);
             });
             
-            mediaList.appendChild(div);
+            mediaList.appendChild(item);
         });
     }
 
     // Плеер
     function playMedia(file) {
-        document.querySelector('.content').style.display = 'none';
+        app.style.display = 'none';
         playerScreen.style.display = 'block';
         
         if (file.type === 'video') {
             videoPlayer.style.display = 'block';
             audioPlayer.style.display = 'none';
-            videoPlayer.src = file.path;
+            videoPlayer.src = '#'; // Заглушка
             videoPlayer.play();
-            if (subtitleBtn) subtitleBtn.style.display = 'block';
+            subtitleBtn.style.display = 'block';
         } else {
             audioPlayer.style.display = 'block';
             videoPlayer.style.display = 'none';
-            audioPlayer.src = file.path;
+            audioPlayer.src = '#'; // Заглушка
             audioPlayer.play();
-            if (subtitleBtn) subtitleBtn.style.display = 'none';
+            subtitleBtn.style.display = 'none';
         }
     }
 
@@ -78,29 +83,24 @@ document.addEventListener('DOMContentLoaded', () => {
     function exitPlayer() {
         if (playerScreen.style.display === 'block') {
             playerScreen.style.display = 'none';
-            document.querySelector('.content').style.display = 'flex';
+            app.style.display = 'block';
             videoPlayer.pause();
             audioPlayer.pause();
         }
     }
 
-    // Обработка системной кнопки "Назад"
     document.addEventListener('backbutton', exitPlayer, false);
 
-    // Тап для паузы/плея
-    if (videoPlayer) {
-        videoPlayer.addEventListener('click', (e) => {
-            e.preventDefault();
-            videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause();
-        });
-    }
+    // Тап пауза/плей
+    videoPlayer.addEventListener('click', (e) => {
+        e.preventDefault();
+        videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause();
+    });
 
-    if (audioPlayer) {
-        audioPlayer.addEventListener('click', (e) => {
-            e.preventDefault();
-            audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
-        });
-    }
+    audioPlayer.addEventListener('click', (e) => {
+        e.preventDefault();
+        audioPlayer.paused ? audioPlayer.play() : audioPlayer.pause();
+    });
 
     // Модалка ссылки
     if (addLinkBtn) {
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const url = urlInput.value.trim();
             if (url) {
                 modal.classList.remove('active');
-                playMedia({ type: 'video', path: url, name: url });
+                playMedia({ type: 'video', name: url, icon: '🔗' });
             }
         });
     }
@@ -138,11 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
         subtitleFile.addEventListener('change', (e) => {
             if (e.target.files[0]) {
                 console.log('Субтитры:', e.target.files[0].name);
-                // Здесь будет загрузка субтитров
             }
         });
     }
 
-    // Инициализация
+    // Старт
     renderMediaList();
 });
