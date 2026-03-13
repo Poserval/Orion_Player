@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM загружен'); // для проверки
+    console.log('DOM загружен');
 
     // Элементы
     const splash = document.getElementById('splash-screen');
@@ -43,6 +43,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const playlistName = document.getElementById('playlist-name');
     const createPlaylistConfirm = document.getElementById('create-playlist-confirm');
     const closePlaylistModal = document.getElementById('close-playlist-modal');
+
+    // Элементы мини-плеера
+    const miniPlayer = document.getElementById('mini-player');
+    const miniIcon = document.getElementById('mini-icon');
+    const miniTrackName = document.getElementById('mini-track-name');
+    const miniPlayPause = document.getElementById('mini-play-pause');
+    const miniTime = document.getElementById('mini-time');
+
+    // Состояние плеера
+    let currentAudio = null;
+    let isPlaying = false;
+    let currentTrack = null;
 
     // Заставка 5 секунд
     if (splash) {
@@ -123,26 +135,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tabItems.length > 0) {
         tabItems.forEach(tab => {
             tab.addEventListener('click', () => {
-                // Убираем активный класс у всех вкладок
                 tabItems.forEach(t => t.classList.remove('active-tab'));
-                // Добавляем активный класс текущей вкладке
                 tab.classList.add('active-tab');
                 
-                // Получаем id контента
                 const tabName = tab.getAttribute('data-tab');
                 
-                // Скрываем все панели
                 document.querySelectorAll('.tab-pane').forEach(pane => {
                     pane.classList.remove('active-pane');
                 });
                 
-                // Показываем нужную панель
                 const activePane = document.getElementById(`tab-${tabName}`);
                 if (activePane) {
                     activePane.classList.add('active-pane');
                 }
 
-                // Закрываем поиск
                 if (searchBar) {
                     searchBar.classList.add('hidden');
                     if (searchInput) searchInput.value = '';
@@ -376,42 +382,133 @@ document.addEventListener('DOMContentLoaded', () => {
         tabsScroll.appendChild(editBtn);
     }
 
-    // ========== ПЛЕЕР ==========
-    function playMedia(file) {
-        if (!app || !playerScreen) return;
-        
-        app.style.display = 'none';
-        playerScreen.style.display = 'block';
-        
-        if (file.type === 'video') {
-            if (videoPlayer) {
-                videoPlayer.style.display = 'block';
-                videoPlayer.src = '#';
-                videoPlayer.play().catch(e => console.log('Автовоспроизведение заблокировано'));
-            }
-            if (audioPlayer) audioPlayer.style.display = 'none';
-            if (subtitleBtn) subtitleBtn.style.display = 'block';
-        } else {
-            if (audioPlayer) {
-                audioPlayer.style.display = 'block';
-                audioPlayer.src = '#';
-                audioPlayer.play().catch(e => console.log('Автовоспроизведение заблокировано'));
-            }
-            if (videoPlayer) videoPlayer.style.display = 'none';
-            if (subtitleBtn) subtitleBtn.style.display = 'none';
+    // ========== ФУНКЦИИ ПЛЕЕРА ==========
+    function formatTime(seconds) {
+        if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function updateMiniPlayerTime() {
+        if (currentAudio) {
+            const current = formatTime(currentAudio.currentTime);
+            const duration = formatTime(currentAudio.duration);
+            miniTime.textContent = `${current} / ${duration}`;
         }
     }
 
+    function playMedia(file) {
+        console.log('Воспроизведение:', file.name);
+        
+        // Останавливаем предыдущее
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+        
+        // Создаем новый аудио-объект
+        currentAudio = new Audio(file.path || file.name);
+        currentTrack = file;
+        
+        // Обновляем мини-плеер
+        miniIcon.textContent = file.icon || '🎵';
+        miniTrackName.textContent = file.name;
+        miniPlayer.classList.remove('hidden');
+        
+        // Обработчики событий
+        currentAudio.addEventListener('timeupdate', updateMiniPlayerTime);
+        currentAudio.addEventListener('loadedmetadata', updateMiniPlayerTime);
+        currentAudio.addEventListener('ended', () => {
+            isPlaying = false;
+            miniPlayPause.textContent = '▶';
+        });
+        
+        // Запускаем
+        currentAudio.play()
+            .then(() => {
+                isPlaying = true;
+                miniPlayPause.textContent = '⏸';
+                console.log('Играет');
+            })
+            .catch(e => {
+                console.error('Ошибка воспроизведения:', e);
+                alert('Не удалось воспроизвести файл');
+            });
+    }
+
+    // Обработчики кликов на медиа-элементы
+    document.querySelectorAll('.media-item, .folder-item, .playlist-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const icon = item.querySelector('.icon')?.textContent || '🎵';
+            const name = item.querySelector('.name')?.textContent || '';
+            
+            // Определяем тип
+            let type = 'audio';
+            if (icon.includes('🎬')) type = 'video';
+            
+            playMedia({ name, icon, type, path: name });
+        });
+    });
+
+    // Управление мини-плеером
+    if (miniPlayPause) {
+        miniPlayPause.addEventListener('click', (e) => {
+            e.stopPropagation();
+            
+            if (currentAudio) {
+                if (isPlaying) {
+                    currentAudio.pause();
+                    miniPlayPause.textContent = '▶';
+                } else {
+                    currentAudio.play();
+                    miniPlayPause.textContent = '⏸';
+                }
+                isPlaying = !isPlaying;
+            }
+        });
+    }
+
+    // Клик по мини-плееру - открываем полноэкранный
+    if (miniPlayer) {
+        miniPlayer.addEventListener('click', () => {
+            if (currentTrack && currentAudio) {
+                app.style.display = 'none';
+                playerScreen.style.display = 'block';
+                
+                const currentTime = currentAudio.currentTime;
+                
+                if (currentTrack.type === 'video') {
+                    videoPlayer.style.display = 'block';
+                    audioPlayer.style.display = 'none';
+                    videoPlayer.src = currentTrack.path || currentTrack.name;
+                    videoPlayer.currentTime = currentTime;
+                    videoPlayer.play();
+                    subtitleBtn.style.display = 'block';
+                } else {
+                    audioPlayer.style.display = 'block';
+                    videoPlayer.style.display = 'none';
+                    audioPlayer.src = currentTrack.path || currentTrack.name;
+                    audioPlayer.currentTime = currentTime;
+                    audioPlayer.play();
+                    subtitleBtn.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    // Выход из полноэкранного плеера
     function exitPlayer() {
         if (playerScreen && playerScreen.style.display === 'block') {
             playerScreen.style.display = 'none';
-            if (app) app.style.display = 'block';
+            app.style.display = 'flex';
+            
             if (videoPlayer) videoPlayer.pause();
             if (audioPlayer) audioPlayer.pause();
         }
     }
 
-    // Обработка системной кнопки назад
     document.addEventListener('backbutton', exitPlayer, false);
 
     // Тап по видео/аудио для паузы/плей
@@ -436,16 +533,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    // Клик по элементам списка для воспроизведения
-    document.querySelectorAll('.media-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const icon = item.querySelector('.icon')?.textContent || '';
-            const name = item.querySelector('.name')?.textContent || '';
-            const type = icon.includes('🎬') ? 'video' : 'audio';
-            playMedia({ type, name, icon });
-        });
-    });
 
     // ========== МОДАЛКА ССЫЛКИ ==========
     if (addLinkBtn) {
@@ -475,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (modal) {
                     modal.classList.remove('active');
                 }
-                playMedia({ type: 'video', name: url, icon: '🔗' });
+                playMedia({ name: url, icon: '🔗', type: 'audio', path: url });
             }
         });
     }
