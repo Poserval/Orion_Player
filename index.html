@@ -7,26 +7,25 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- ЗАСТАВКА (orion_splash.png) -->
+    <!-- ЗАСТАВКА -->
     <div id="splash-screen">
         <img src="assets/images/orion_splash.png" alt="Orion Player" class="splash-image">
     </div>
 
-    <!-- ФОН (orion_bg.png) -->
+    <!-- ФОН -->
     <div class="background-constellation">
         <img src="assets/images/orion_bg.png" alt="Orion Background" class="bg-image">
     </div>
 
     <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <div id="app">
-        <!-- ХЕДЕР (ОДИН НА ВСЕ СТРАНИЦЫ) -->
+        <!-- ХЕДЕР -->
         <div class="top-icon">
             <img src="assets/images/icon-header.png" alt="Orion">
         </div>
 
         <!-- СТРАНИЦА 1 - ГЛАВНАЯ -->
         <div id="page-main" class="page active-page">
-            <!-- СЕТКА КНОПОК 2x2 -->
             <div class="category-grid">
                 <div class="category-btn" data-category="music" id="music-btn">
                     <span>Музыка</span>
@@ -42,12 +41,10 @@
                 </div>
             </div>
 
-            <!-- РАЗДЕЛИТЕЛЬ -->
             <div class="section-divider">
                 <span class="divider-text">Недавно добавленные</span>
             </div>
 
-            <!-- ОКНО С МЕДИАФАЙЛАМИ (15 штук для проверки скролла) -->
             <div class="media-window">
                 <div class="media-list" id="media-list">
                     <div class="media-item">
@@ -120,86 +117,247 @@
                 <div class="header-left"></div>
                 <div class="header-title">Музыка</div>
                 <div class="header-right">
+                    <button id="search-toggle" class="search-icon-btn">🔍</button>
                     <button id="back-to-main" class="back-btn">← Назад</button>
                 </div>
+            </div>
+
+            <!-- ПОИСКОВАЯ СТРОКА (изначально скрыта) -->
+            <div id="search-bar" class="search-bar hidden">
+                <input type="text" id="search-input" placeholder="Поиск по названию..." autocomplete="off">
+                <button id="search-clear" class="search-clear">✕</button>
             </div>
 
             <!-- ВКЛАДКИ -->
             <div class="tabs-container">
                 <div class="tabs-scroll" id="tabs-scroll">
-                    <div class="tab-item active-tab" data-tab="all">Все</div>
-                    <div class="tab-item" data-tab="folders">Папки</div>
-                    <div class="tab-item" data-tab="playlists">Плейлисты</div>
-                    <div class="tab-item" data-tab="albums">Альбомы</div>
-                    <div class="tab-item" data-tab="artists">Артист</div>
-                    <div class="tab-item" data-tab="genres">Жанры</div>
+                    <div class="tab-item active-tab" data-tab="all">Все <span class="tab-count" id="count-all">128</span></div>
+                    <div class="tab-item" data-tab="folders">Папки <span class="tab-count" id="count-folders">12</span></div>
+                    <div class="tab-item" data-tab="playlists">Плейлисты <span class="tab-count" id="count-playlists">3</span></div>
+                    <div class="tab-item" data-tab="albums">Альбомы <span class="tab-count" id="count-albums">24</span></div>
+                    <div class="tab-item" data-tab="artists">Артист <span class="tab-count" id="count-artists">18</span></div>
+                    <div class="tab-item" data-tab="genres">Жанры <span class="tab-count" id="count-genres">9</span></div>
                     <div class="tab-item edit-tab" id="edit-tabs-btn">✎</div>
                 </div>
             </div>
 
             <!-- КОНТЕНТ ВКЛАДОК -->
             <div class="tab-content">
+                <!-- ВСЕ -->
                 <div class="tab-pane active-pane" id="tab-all">
+                    <div class="pane-header">
+                        <span class="pane-title">Все аудиофайлы</span>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn">Сортировка: Название ▼</button>
+                            <div class="sort-menu">
+                                <div class="sort-item" data-sort="name">По названию</div>
+                                <div class="sort-item" data-sort="size">По размеру</div>
+                                <div class="sort-item" data-sort="date">По дате</div>
+                                <div class="sort-item" data-sort="duration">По длительности</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="media-window full-height">
                         <div class="media-list" id="all-audio-list">
                             <div class="media-item">
                                 <span class="icon">🎵</span>
                                 <span class="name">трек_1.mp3</span>
+                                <span class="file-size">5.2 MB</span>
                             </div>
                             <div class="media-item">
                                 <span class="icon">🎵</span>
                                 <span class="name">трек_2.flac</span>
+                                <span class="file-size">24.8 MB</span>
+                            </div>
+                            <div class="media-item">
+                                <span class="icon">🎵</span>
+                                <span class="name">любимая_песня.mp3</span>
+                                <span class="file-size">8.1 MB</span>
+                            </div>
+                            <div class="media-item">
+                                <span class="icon">🎵</span>
+                                <span class="name">подкаст_интервью.mp3</span>
+                                <span class="file-size">45.3 MB</span>
+                            </div>
+                            <div class="media-item">
+                                <span class="icon">🎵</span>
+                                <span class="name">классика_бетховен.flac</span>
+                                <span class="file-size">32.7 MB</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- ПАПКИ -->
                 <div class="tab-pane" id="tab-folders">
+                    <div class="pane-header">
+                        <span class="pane-title">Папки с аудио</span>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn">Сортировка: Название ▼</button>
+                            <div class="sort-menu">
+                                <div class="sort-item" data-sort="name">По названию</div>
+                                <div class="sort-item" data-sort="count">По количеству</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="media-window full-height">
                         <div class="media-list">
                             <div class="folder-item">
                                 <span class="icon">📁</span>
                                 <span class="name">Музыка</span>
+                                <span class="file-count">45 файлов</span>
+                            </div>
+                            <div class="folder-item">
+                                <span class="icon">📁</span>
+                                <span class="name">Подкасты</span>
+                                <span class="file-count">12 файлов</span>
+                            </div>
+                            <div class="folder-item">
+                                <span class="icon">📁</span>
+                                <span class="name">Записи</span>
+                                <span class="file-count">8 файлов</span>
+                            </div>
+                            <div class="folder-item">
+                                <span class="icon">📁</span>
+                                <span class="name">Аудиокниги</span>
+                                <span class="file-count">23 файла</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- ПЛЕЙЛИСТЫ -->
                 <div class="tab-pane" id="tab-playlists">
-                    <div class="empty-state">
-                        <span class="empty-icon">📋</span>
-                        <span class="empty-text">Нет плейлистов</span>
+                    <div class="pane-header">
+                        <span class="pane-title">Плейлисты</span>
+                        <button id="create-playlist-btn" class="create-btn">+ Новый плейлист</button>
+                    </div>
+                    <div class="media-window full-height">
+                        <div class="media-list" id="playlists-list">
+                            <div class="playlist-item">
+                                <span class="icon">📋</span>
+                                <span class="name">Любимое</span>
+                                <span class="file-count">15 треков</span>
+                            </div>
+                            <div class="playlist-item">
+                                <span class="icon">📋</span>
+                                <span class="name">В машину</span>
+                                <span class="file-count">23 трека</span>
+                            </div>
+                            <div class="playlist-item">
+                                <span class="icon">📋</span>
+                                <span class="name">Для сна</span>
+                                <span class="file-count">8 треков</span>
+                            </div>
+                            <div class="playlist-item">
+                                <span class="icon">📋</span>
+                                <span class="name">Тренировки</span>
+                                <span class="file-count">19 треков</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+                <!-- АЛЬБОМЫ -->
                 <div class="tab-pane" id="tab-albums">
+                    <div class="pane-header">
+                        <span class="pane-title">Альбомы</span>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn">Сортировка: Название ▼</button>
+                            <div class="sort-menu">
+                                <div class="sort-item" data-sort="name">По названию</div>
+                                <div class="sort-item" data-sort="artist">По артисту</div>
+                                <div class="sort-item" data-sort="year">По году</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="media-window full-height">
                         <div class="media-list">
                             <div class="media-item">
                                 <span class="icon">💿</span>
                                 <span class="name">Альбом 2024</span>
+                                <span class="artist-name">Исполнитель 1</span>
+                            </div>
+                            <div class="media-item">
+                                <span class="icon">💿</span>
+                                <span class="name">Сборник хитов</span>
+                                <span class="artist-name">Разные</span>
+                            </div>
+                            <div class="media-item">
+                                <span class="icon">💿</span>
+                                <span class="name">Классика</span>
+                                <span class="artist-name">Моцарт</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- АРТИСТ -->
                 <div class="tab-pane" id="tab-artists">
+                    <div class="pane-header">
+                        <span class="pane-title">Исполнители</span>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn">Сортировка: Имя ▼</button>
+                            <div class="sort-menu">
+                                <div class="sort-item" data-sort="name">По имени</div>
+                                <div class="sort-item" data-sort="count">По количеству</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="media-window full-height">
                         <div class="media-list">
                             <div class="media-item">
                                 <span class="icon">👤</span>
                                 <span class="name">Исполнитель 1</span>
+                                <span class="file-count">12 треков</span>
+                            </div>
+                            <div class="media-item">
+                                <span class="icon">👤</span>
+                                <span class="name">Исполнитель 2</span>
+                                <span class="file-count">8 треков</span>
+                            </div>
+                            <div class="media-item">
+                                <span class="icon">👤</span>
+                                <span class="name">Исполнитель 3</span>
+                                <span class="file-count">15 треков</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- ЖАНРЫ -->
                 <div class="tab-pane" id="tab-genres">
+                    <div class="pane-header">
+                        <span class="pane-title">Жанры</span>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn">Сортировка: Название ▼</button>
+                            <div class="sort-menu">
+                                <div class="sort-item" data-sort="name">По названию</div>
+                                <div class="sort-item" data-sort="count">По количеству</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="media-window full-height">
                         <div class="media-list">
                             <div class="media-item">
                                 <span class="icon">🎸</span>
                                 <span class="name">Рок</span>
+                                <span class="file-count">34 трека</span>
+                            </div>
+                            <div class="media-item">
+                                <span class="icon">🎹</span>
+                                <span class="name">Классика</span>
+                                <span class="file-count">28 треков</span>
+                            </div>
+                            <div class="media-item">
+                                <span class="icon">🎤</span>
+                                <span class="name">Поп</span>
+                                <span class="file-count">42 трека</span>
+                            </div>
+                            <div class="media-item">
+                                <span class="icon">🎧</span>
+                                <span class="name">Электроника</span>
+                                <span class="file-count">19 треков</span>
                             </div>
                         </div>
                     </div>
@@ -210,11 +368,23 @@
         <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ВКЛАДОК -->
         <div id="edit-tabs-modal" class="modal">
             <div class="modal-content">
-                <h3>Редактировать вкладки</h3>
+                <h3 class="modal-title">Редактировать вкладки</h3>
                 <div class="edit-tabs-list" id="edit-tabs-list"></div>
                 <div class="modal-buttons">
                     <button id="save-tabs-btn">Готово</button>
                     <button id="close-edit-modal-btn">Отмена</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модалка нового плейлиста -->
+        <div id="new-playlist-modal" class="modal">
+            <div class="modal-content">
+                <h3>Новый плейлист</h3>
+                <input type="text" id="playlist-name" placeholder="Название плейлиста">
+                <div class="modal-buttons">
+                    <button id="create-playlist-confirm">Создать</button>
+                    <button id="close-playlist-modal">Отмена</button>
                 </div>
             </div>
         </div>
