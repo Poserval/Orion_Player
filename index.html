@@ -26,7 +26,7 @@
 
         <!-- СТРАНИЦА 1 - ГЛАВНАЯ -->
         <div id="page-main" class="page active-page">
-            <!-- СЕТКА КНОПОК 2x2 (фиксированная, не скроллится) -->
+            <!-- СЕТКА КНОПОК 2x2 -->
             <div class="category-grid">
                 <div class="category-btn" data-category="music" id="music-btn">
                     <span>Музыка</span>
@@ -42,15 +42,14 @@
                 </div>
             </div>
 
-            <!-- РАЗДЕЛИТЕЛЬ - НАДПИСЬ НЕДАВНО ДОБАВЛЕННЫЕ (фиксированная) -->
+            <!-- РАЗДЕЛИТЕЛЬ -->
             <div class="section-divider">
                 <span class="divider-text">Недавно добавленные</span>
             </div>
 
-            <!-- БОЛЬШОЕ ОКНО С МЕДИАФАЙЛАМИ (только здесь скролл) -->
+            <!-- ОКНО С МЕДИАФАЙЛАМИ (15 штук для проверки скролла) -->
             <div class="media-window">
                 <div class="media-list" id="media-list">
-                    <!-- Заглушки файлов -->
                     <div class="media-item">
                         <span class="icon">🎬</span>
                         <span class="name">видео_20250313.mp4</span>
@@ -79,13 +78,44 @@
                         <span class="icon">🎵</span>
                         <span class="name">ещё_трек.mp3</span>
                     </div>
+                    <div class="media-item">
+                        <span class="icon">🎬</span>
+                        <span class="name">клип_2024.mp4</span>
+                    </div>
+                    <div class="media-item">
+                        <span class="icon">🎵</span>
+                        <span class="name">подкаст_5.mp3</span>
+                    </div>
+                    <div class="media-item">
+                        <span class="icon">🎧</span>
+                        <span class="name">война_и_мир_1.mp3</span>
+                    </div>
+                    <div class="media-item">
+                        <span class="icon">🎬</span>
+                        <span class="name">концерт_live.mp4</span>
+                    </div>
+                    <div class="media-item">
+                        <span class="icon">🎵</span>
+                        <span class="name">классика_моцарт.flac</span>
+                    </div>
+                    <div class="media-item">
+                        <span class="icon">🎬</span>
+                        <span class="name">интервью_звезда.mp4</span>
+                    </div>
+                    <div class="media-item">
+                        <span class="icon">🎵</span>
+                        <span class="name">рок_хит_2000.mp3</span>
+                    </div>
+                    <div class="media-item">
+                        <span class="icon">🎧</span>
+                        <span class="name">аудиокнига_том_2.mp3</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- СТРАНИЦА 2 - МУЗЫКА -->
         <div id="page-music" class="page">
-            <!-- КНОПКА ВОЗВРАТА И ЗАГОЛОВОК -->
             <div class="page-header">
                 <div class="header-left"></div>
                 <div class="header-title">Музыка</div>
@@ -94,7 +124,7 @@
                 </div>
             </div>
 
-            <!-- СКРОЛЛИМЫЕ ВКЛАДКИ -->
+            <!-- ВКЛАДКИ -->
             <div class="tabs-container">
                 <div class="tabs-scroll" id="tabs-scroll">
                     <div class="tab-item active-tab" data-tab="all">Все</div>
@@ -109,7 +139,6 @@
 
             <!-- КОНТЕНТ ВКЛАДОК -->
             <div class="tab-content">
-                <!-- Вкладка "Все" -->
                 <div class="tab-pane active-pane" id="tab-all">
                     <div class="media-window full-height">
                         <div class="media-list" id="all-audio-list">
@@ -121,15 +150,10 @@
                                 <span class="icon">🎵</span>
                                 <span class="name">трек_2.flac</span>
                             </div>
-                            <div class="media-item">
-                                <span class="icon">🎵</span>
-                                <span class="name">трек_3.wav</span>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Вкладка "Папки" -->
                 <div class="tab-pane" id="tab-folders">
                     <div class="media-window full-height">
                         <div class="media-list">
@@ -137,15 +161,10 @@
                                 <span class="icon">📁</span>
                                 <span class="name">Музыка</span>
                             </div>
-                            <div class="folder-item">
-                                <span class="icon">📁</span>
-                                <span class="name">Подкасты</span>
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Вкладка "Плейлисты" (пустая) -->
                 <div class="tab-pane" id="tab-playlists">
                     <div class="empty-state">
                         <span class="empty-icon">📋</span>
@@ -153,7 +172,6 @@
                     </div>
                 </div>
 
-                <!-- Вкладка "Альбомы" -->
                 <div class="tab-pane" id="tab-albums">
                     <div class="media-window full-height">
                         <div class="media-list">
@@ -165,7 +183,6 @@
                     </div>
                 </div>
 
-                <!-- Вкладка "Артист" -->
                 <div class="tab-pane" id="tab-artists">
                     <div class="media-window full-height">
                         <div class="media-list">
@@ -177,7 +194,6 @@
                     </div>
                 </div>
 
-                <!-- Вкладка "Жанры" -->
                 <div class="tab-pane" id="tab-genres">
                     <div class="media-window full-height">
                         <div class="media-list">
