@@ -130,6 +130,17 @@ body {
     color: #d0e0ff;
     cursor: pointer;
     aspect-ratio: 1 / 0.8;
+    transition: all 0.2s;
+}
+
+.category-btn:active {
+    background: rgba(40, 60, 85, 0.8);
+    transform: scale(0.98);
+}
+
+.category-btn span {
+    display: block;
+    line-height: 1.3;
 }
 
 .section-divider {
@@ -169,32 +180,42 @@ body {
     padding: 12px 8px;
 }
 
-.media-item, .folder-item {
+.media-item, .folder-item, .playlist-item {
     display: flex;
     align-items: center;
     padding: 14px 16px;
     border-bottom: 1px solid rgba(80, 100, 130, 0.2);
     cursor: pointer;
+    gap: 12px;
+    transition: background 0.1s;
 }
 
-.media-item:active, .folder-item:active {
+.media-item:active, .folder-item:active, .playlist-item:active {
     background: rgba(40, 60, 90, 0.5);
     border-radius: 16px;
 }
 
-.media-item .icon, .folder-item .icon {
+.media-item .icon, .folder-item .icon, .playlist-item .icon {
     width: 40px;
     font-size: 24px;
     margin-right: 16px;
     text-align: center;
 }
 
-.media-item .name, .folder-item .name {
+.media-item .name, .folder-item .name, .playlist-item .name {
     font-size: 16px;
     color: #e0e8ff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    flex: 1;
+}
+
+.file-size, .file-count, .artist-name {
+    font-size: 13px;
+    color: #8098c0;
+    margin-left: auto;
+    white-space: nowrap;
 }
 
 /* ========== СТРАНИЦА МУЗЫКИ ========== */
@@ -228,8 +249,10 @@ body {
 }
 
 .header-right {
-    width: 60px;
     display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 60px;
     justify-content: flex-end;
 }
 
@@ -241,6 +264,63 @@ body {
     border-radius: 30px;
     font-size: 14px;
     cursor: pointer;
+    backdrop-filter: blur(4px);
+}
+
+.back-btn:active {
+    background: rgba(50, 70, 100, 0.9);
+}
+
+/* ========== КНОПКА ПОИСКА ========== */
+.search-icon-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0 8px;
+    color: #b0c8f0;
+}
+
+/* ========== ПОИСКОВАЯ СТРОКА ========== */
+.search-bar {
+    width: 100%;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.search-bar.hidden {
+    display: none;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(20, 30, 45, 0.8);
+    border: 1px solid rgba(100, 130, 170, 0.5);
+    border-radius: 30px;
+    color: white;
+    font-size: 16px;
+    backdrop-filter: blur(4px);
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: rgba(150, 190, 255, 0.8);
+}
+
+.search-clear {
+    position: absolute;
+    right: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #8098c0;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 8px;
 }
 
 /* ========== ВКЛАДКИ ========== */
@@ -267,6 +347,9 @@ body {
 }
 
 .tab-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     padding: 8px 16px;
     background: rgba(30, 40, 60, 0.5);
     backdrop-filter: blur(4px);
@@ -276,6 +359,12 @@ body {
     color: #b0c8f0;
     cursor: pointer;
     flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.tab-item:active {
+    background: rgba(50, 70, 100, 0.8);
+    transform: scale(0.96);
 }
 
 .tab-item.active-tab {
@@ -283,6 +372,14 @@ body {
     border-color: rgba(150, 190, 255, 0.6);
     color: white;
     font-weight: 500;
+}
+
+.tab-count {
+    background: rgba(60, 90, 130, 0.5);
+    border-radius: 30px;
+    padding: 2px 8px;
+    font-size: 12px;
+    color: #b0d0ff;
 }
 
 .edit-tab {
@@ -301,16 +398,101 @@ body {
 .tab-pane {
     display: none;
     height: 100%;
+    flex-direction: column;
 }
 
 .tab-pane.active-pane {
-    display: block;
-    height: 100%;
+    display: flex;
+}
+
+.pane-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(100, 130, 170, 0.2);
+    margin-bottom: 12px;
+    flex-shrink: 0;
+}
+
+.pane-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #c0d4ff;
 }
 
 .full-height {
-    height: 100%;
+    flex: 1;
+    min-height: 0;
     margin-top: 0;
+    width: 100%;
+}
+
+/* ========== КНОПКА СОРТИРОВКИ ========== */
+.sort-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.sort-btn {
+    background: rgba(30, 40, 60, 0.8);
+    border: 1px solid rgba(100, 130, 170, 0.4);
+    color: #b0c8f0;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 14px;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+}
+
+.sort-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: #1a2430;
+    border: 1px solid rgba(100, 130, 170, 0.4);
+    border-radius: 16px;
+    padding: 8px 0;
+    min-width: 180px;
+    z-index: 100;
+    margin-top: 4px;
+}
+
+.sort-dropdown:hover .sort-menu,
+.sort-dropdown:active .sort-menu {
+    display: block;
+}
+
+.sort-item {
+    padding: 12px 16px;
+    color: #d0e0ff;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.sort-item:hover {
+    background: rgba(60, 90, 130, 0.5);
+}
+
+.sort-item:active {
+    background: rgba(80, 120, 170, 0.7);
+}
+
+/* ========== КНОПКА СОЗДАНИЯ ПЛЕЙЛИСТА ========== */
+.create-btn {
+    background: rgba(40, 70, 110, 0.8);
+    border: 1px solid rgba(100, 150, 220, 0.6);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 14px;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+}
+
+.create-btn:active {
+    background: rgba(60, 100, 150, 0.9);
 }
 
 /* ========== ПУСТОЕ СОСТОЯНИЕ ========== */
@@ -335,6 +517,11 @@ body {
     margin-bottom: 8px;
 }
 
+.empty-hint {
+    font-size: 14px;
+    opacity: 0.6;
+}
+
 /* ========== МОДАЛКИ ========== */
 .modal {
     position: fixed;
@@ -347,6 +534,7 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 500;
+    backdrop-filter: blur(8px);
 }
 
 .modal.active {
@@ -358,16 +546,79 @@ body {
     width: 90%;
     max-width: 400px;
     padding: 24px;
-    border-radius: 16px;
+    border-radius: 24px;
+    border: 1px solid rgba(100, 130, 170, 0.3);
 }
 
+.modal-title {
+    text-align: center;
+    margin-bottom: 16px;
+    color: #b7c4d9;
+    font-weight: 400;
+    font-size: 18px;
+}
+
+.modal-content h3 {
+    margin-bottom: 16px;
+    color: #b7c4d9;
+    font-weight: 400;
+    text-align: center;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 14px;
+    background: #1e262f;
+    border: 1px solid #2e3a48;
+    border-radius: 30px;
+    color: white;
+    font-size: 16px;
+    margin: 16px 0;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: rgba(100, 150, 220, 0.8);
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#play-url-btn, #save-tabs-btn, #create-playlist-confirm {
+    background: #3a4a5e;
+    color: white;
+}
+
+#close-modal-btn, #close-edit-modal-btn, #close-playlist-modal {
+    background: #1e262f;
+    color: #8f9bb3;
+}
+
+.modal-buttons button:active {
+    transform: scale(0.96);
+}
+
+/* ========== МОДАЛКА РЕДАКТИРОВАНИЯ ========== */
 .edit-tabs-list {
     max-height: 300px;
     overflow-y: auto;
     margin: 16px 0;
     padding: 8px;
     background: rgba(20, 30, 45, 0.5);
-    border-radius: 12px;
+    border-radius: 16px;
 }
 
 .edit-tab-item {
@@ -379,30 +630,22 @@ body {
     border-radius: 30px;
     cursor: grab;
     border: 1px solid rgba(100, 130, 170, 0.3);
+    color: #d0e0ff;
 }
 
-.modal-buttons {
-    display: flex;
-    gap: 12px;
+.edit-tab-item:active {
+    cursor: grabbing;
+    background: rgba(50, 70, 100, 0.9);
 }
 
-.modal-buttons button {
+.edit-tab-item .drag-handle {
+    margin-right: 12px;
+    color: #8098c0;
+    font-size: 18px;
+}
+
+.edit-tab-item .tab-name {
     flex: 1;
-    padding: 14px;
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-#play-url-btn, #save-tabs-btn {
-    background: #3a4a5e;
-    color: white;
-}
-
-#close-modal-btn, #close-edit-modal-btn {
-    background: #1e262f;
-    color: #8f9bb3;
 }
 
 /* ========== ПЛЕЕР ========== */
@@ -422,6 +665,12 @@ body {
     object-fit: contain;
 }
 
+#audio-player {
+    width: 100%;
+    height: 100%;
+}
+
+/* ========== СУБТИТРЫ ========== */
 .subtitle-btn {
     position: fixed;
     bottom: 30px;
@@ -438,4 +687,9 @@ body {
     border-radius: 40px;
     font-size: 16px;
     cursor: pointer;
+}
+
+#load-subtitle:active {
+    background: rgba(40,60,80,0.9);
+    transform: scale(0.96);
 }
