@@ -7,13 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = document.getElementById('close-modal-btn');
     const playUrlBtn = document.getElementById('play-url-btn');
     const urlInput = document.getElementById('url-input');
-    const mediaList = document.getElementById('media-list');
     const playerScreen = document.getElementById('player-screen');
     const videoPlayer = document.getElementById('video-player');
     const audioPlayer = document.getElementById('audio-player');
     const subtitleBtn = document.getElementById('subtitle-btn');
     const loadSubtitle = document.getElementById('load-subtitle');
     const subtitleFile = document.getElementById('subtitle-file');
+    
+    // Элементы страниц
+    const pageMain = document.getElementById('page-main');
+    const pageMusic = document.getElementById('page-music');
+    const musicBtn = document.getElementById('music-btn');
+    const backToMain = document.getElementById('back-to-main');
 
     // Заставка 5 секунд
     setTimeout(() => {
@@ -23,6 +28,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }, 5000);
 
+    // Переключение на страницу Музыка
+    if (musicBtn) {
+        musicBtn.addEventListener('click', () => {
+            pageMain.classList.remove('active-page');
+            pageMusic.classList.add('active-page');
+        });
+    }
+
+    // Возврат на главную
+    if (backToMain) {
+        backToMain.addEventListener('click', () => {
+            pageMusic.classList.remove('active-page');
+            pageMain.classList.add('active-page');
+        });
+    }
+
     // Заглушки для списка (временные данные)
     const mockRecentFiles = [
         { name: 'видео_20250313.mp4', type: 'video', icon: '🎬' },
@@ -30,15 +51,12 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: 'книга_глава_3.mp3', type: 'audiobook', icon: '🎧' },
         { name: 'видос_с_работы.mp4', type: 'video', icon: '🎬' },
         { name: 'новый_трек.flac', type: 'audio', icon: '🎵' },
-        { name: 'фильм_до_конца.mp4', type: 'video', icon: '🎬' },
-        { name: 'ещё_один_трек.mp3', type: 'audio', icon: '🎵' },
-        { name: 'клип_на_памяти.mp4', type: 'video', icon: '🎬' },
-        { name: 'аудиокнига_том_1.mp3', type: 'audiobook', icon: '🎧' },
-        { name: 'запись_стрима.mp4', type: 'video', icon: '🎬' }
+        { name: 'фильм_до_конца.mp4', type: 'video', icon: '🎬' }
     ];
 
-    // Заполняем список файлов
-    function renderMediaList() {
+    // Заполняем список файлов на главной
+    const mediaList = document.getElementById('media-list');
+    function renderMainList() {
         if (!mediaList) return;
         
         mediaList.innerHTML = '';
@@ -143,5 +161,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Старт
-    renderMediaList();
+    renderMainList();
 });
