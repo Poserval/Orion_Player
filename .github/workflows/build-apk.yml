@@ -30,7 +30,6 @@ jobs:
       - name: Install dependencies
         run: |
           npm install --legacy-peer-deps
-          npx cap init OrionPlayer com.orion.player --skip-npm
 
       - name: Prepare web directory
         run: |
@@ -42,8 +41,13 @@ jobs:
 
       - name: Update webDir in config
         run: |
-          # Используем echo для замены - так безопаснее
+          # Заменяем webDir на www
           sed -i 's/"webDir": "."/"webDir": "www"/' capacitor.config.json
+
+      - name: Initialize Capacitor
+        run: |
+          # Инициализируем без флагов
+          npx cap init OrionPlayer com.orion.player
 
       - name: Add Android platform
         run: |
