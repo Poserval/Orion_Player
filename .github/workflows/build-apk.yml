@@ -41,7 +41,9 @@ jobs:
           cp -r assets www/
 
       - name: Update webDir in config
-        run: sed -i 's/"webDir": "."/"webDir": "www"/' capacitor.config.json
+        run: |
+          # Используем echo для замены - так безопаснее
+          sed -i 's/"webDir": "."/"webDir": "www"/' capacitor.config.json
 
       - name: Add Android platform
         run: |
