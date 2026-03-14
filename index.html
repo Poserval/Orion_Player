@@ -213,6 +213,69 @@
             </div>
         </div>
 
+        <!-- ПОЛНОЭКРАННЫЙ ПЛЕЕР (ОБНОВЛЕННЫЙ) -->
+        <div id="player-screen" style="display: none;">
+            <div class="fullscreen-player">
+                <!-- Фоновый градиент (как на образце) -->
+                <div class="player-background"></div>
+                
+                <!-- Кнопка закрытия (крестик) -->
+                <button class="player-close-btn" id="player-close">✕</button>
+                
+                <!-- Основной контент плеера -->
+                <div class="player-content">
+                    <!-- Обложка (пока заглушка) -->
+                    <div class="player-artwork">
+                        <div class="artwork-placeholder">🎵</div>
+                    </div>
+                    
+                    <!-- Информация о треке -->
+                    <div class="player-track-info">
+                        <div class="player-track-name" id="player-track-name">Песня 9. Настроение май ...</div>
+                        <div class="player-track-artist" id="player-track-artist">dumbstruckdynamics736</div>
+                    </div>
+                    
+                    <!-- Прогресс-бар -->
+                    <div class="player-progress-container">
+                        <div class="player-progress-bar" id="player-progress-bar">
+                            <div class="player-progress-fill" id="player-progress-fill"></div>
+                            <div class="player-progress-handle" id="player-progress-handle"></div>
+                        </div>
+                        <div class="player-time">
+                            <span id="player-current-time">0:00</span>
+                            <span id="player-duration">3:45</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Кнопки управления (как на образце) -->
+                    <div class="player-controls">
+                        <button class="player-control-btn like-btn">❤️</button>
+                        <button class="player-control-btn prev-btn" id="player-prev">⏮</button>
+                        <button class="player-control-btn play-btn" id="player-play-pause">⏸</button>
+                        <button class="player-control-btn next-btn" id="player-next">⏭</button>
+                        <button class="player-control-btn menu-btn" id="player-menu">⋮</button>
+                    </div>
+                    
+                    <!-- Нижняя панель (скорость, плейлист, устройства) -->
+                    <div class="player-bottom-panel">
+                        <button class="player-bottom-btn" id="player-speed">1x</button>
+                        <button class="player-bottom-btn" id="player-playlist">📋 Плейлист</button>
+                        <button class="player-bottom-btn" id="player-devices">📱 Устройства</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Скрытые нативные плееры (для воспроизведения) -->
+            <video id="video-player" style="display: none;"></video>
+            <audio id="audio-player" style="display: none;"></audio>
+            
+            <!-- Кнопка субтитров (для видео) -->
+            <div class="subtitle-btn" id="subtitle-btn" style="display: none;">
+                <button id="load-subtitle">📄 Субтитры</button>
+                <input type="file" id="subtitle-file" accept=".srt" style="display: none;">
+            </div>
+        </div>
+
         <!-- МЕНЮ ТРЕКА -->
         <div id="track-menu-modal" class="modal">
             <div class="modal-content track-menu-content">
@@ -280,7 +343,6 @@
                     <span class="track-format" id="cut-track-format">mp3, 48000 Гц, 177 кб/с, 04:08</span>
                 </div>
 
-                <!-- Визуализация волны -->
                 <div class="waveform-container">
                     <div class="waveform" id="waveform">
                         <div class="waveform-bars" id="waveform-bars"></div>
@@ -301,10 +363,8 @@
                     </div>
                 </div>
 
-                <!-- Кнопка выбора всего трека -->
                 <button id="select-full-track" class="select-full-btn">Выбрать весь трек</button>
 
-                <!-- Точные значения начала и конца -->
                 <div class="cut-exact-values">
                     <div class="exact-value-item">
                         <span class="exact-label">Начало:</span>
@@ -322,7 +382,6 @@
                     </div>
                 </div>
 
-                <!-- Текущая позиция -->
                 <div class="current-position">
                     <span id="current-position">00:44.9</span>
                 </div>
@@ -408,16 +467,6 @@
                     <button id="play-url-btn">Играть</button>
                     <button id="close-modal-btn">Отмена</button>
                 </div>
-            </div>
-        </div>
-
-        <!-- ПОЛНОЭКРАННЫЙ ПЛЕЕР -->
-        <div id="player-screen" style="display: none;">
-            <video id="video-player" controls style="width:100%; height:100%;"></video>
-            <audio id="audio-player" controls style="display: none;"></audio>
-            <div class="subtitle-btn" id="subtitle-btn" style="display: none;">
-                <button id="load-subtitle">📄 Субтитры</button>
-                <input type="file" id="subtitle-file" accept=".srt" style="display: none;">
             </div>
         </div>
     </div>
