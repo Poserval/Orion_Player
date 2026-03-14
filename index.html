@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Orion Player</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Подключаем Capacitor для конвертации путей -->
+    <script src="https://unpkg.com/@capacitor/core@latest/dist/capacitor.js"></script>
 </head>
 <body>
     <!-- ЗАСТАВКА -->
@@ -30,13 +32,13 @@
                 <div class="category-btn" data-category="music" id="music-btn">
                     <span>Музыка</span>
                 </div>
-                <div class="category-btn" data-category="video">
+                <div class="category-btn" data-category="video" id="video-btn">
                     <span>Видео</span>
                 </div>
-                <div class="category-btn" data-category="images">
+                <div class="category-btn" data-category="images" id="images-btn">
                     <span>Изображения</span>
                 </div>
-                <div class="category-btn" data-category="audiobooks">
+                <div class="category-btn" data-category="audiobooks" id="audiobooks-btn">
                     <span>Аудиокниги</span>
                 </div>
             </div>
@@ -47,25 +49,7 @@
 
             <div class="media-window">
                 <div class="media-list" id="media-list">
-                    <!-- ТЕСТОВЫЕ ФАЙЛЫ -->
-                    <div class="media-item">
-                        <span class="icon">🎬</span>
-                        <span class="name">видео_20250313.mp4</span>
-                        <span class="file-size">15.2 MB</span>
-                        <button class="track-menu-btn">⋮</button>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎵</span>
-                        <span class="name">трек_вчера.mp3</span>
-                        <span class="file-size">5.2 MB</span>
-                        <button class="track-menu-btn">⋮</button>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎧</span>
-                        <span class="name">книга_глава_3.mp3</span>
-                        <span class="file-size">28.4 MB</span>
-                        <button class="track-menu-btn">⋮</button>
-                    </div>
+                    <!-- Динамически заполняется через JS -->
                 </div>
             </div>
         </div>
@@ -90,18 +74,19 @@
             <!-- ВКЛАДКИ -->
             <div class="tabs-container">
                 <div class="tabs-scroll" id="tabs-scroll">
-                    <div class="tab-item active-tab" data-tab="all">Все <span class="tab-count" id="count-all">128</span></div>
-                    <div class="tab-item" data-tab="folders">Папки <span class="tab-count" id="count-folders">12</span></div>
-                    <div class="tab-item" data-tab="playlists">Плейлисты <span class="tab-count" id="count-playlists">3</span></div>
-                    <div class="tab-item" data-tab="albums">Альбомы <span class="tab-count" id="count-albums">24</span></div>
-                    <div class="tab-item" data-tab="artists">Артист <span class="tab-count" id="count-artists">18</span></div>
-                    <div class="tab-item" data-tab="genres">Жанры <span class="tab-count" id="count-genres">9</span></div>
+                    <div class="tab-item active-tab" data-tab="all">Все <span class="tab-count" id="count-all">0</span></div>
+                    <div class="tab-item" data-tab="folders">Папки <span class="tab-count" id="count-folders">0</span></div>
+                    <div class="tab-item" data-tab="playlists">Плейлисты <span class="tab-count" id="count-playlists">0</span></div>
+                    <div class="tab-item" data-tab="albums">Альбомы <span class="tab-count" id="count-albums">0</span></div>
+                    <div class="tab-item" data-tab="artists">Артист <span class="tab-count" id="count-artists">0</span></div>
+                    <div class="tab-item" data-tab="genres">Жанры <span class="tab-count" id="count-genres">0</span></div>
                     <div class="tab-item edit-tab" id="edit-tabs-btn">✎</div>
                 </div>
             </div>
 
             <!-- КОНТЕНТ ВКЛАДОК -->
             <div class="tab-content">
+                <!-- ВСЕ -->
                 <div class="tab-pane active-pane" id="tab-all">
                     <div class="pane-header">
                         <span class="pane-title">Все аудиофайлы</span>
@@ -111,23 +96,103 @@
                                 <div class="sort-item" data-sort="name">По названию</div>
                                 <div class="sort-item" data-sort="size">По размеру</div>
                                 <div class="sort-item" data-sort="date">По дате</div>
+                                <div class="sort-item" data-sort="duration">По длительности</div>
                             </div>
                         </div>
                     </div>
                     <div class="media-window full-height" id="music-media-window">
                         <div class="media-list" id="all-audio-list">
-                            <div class="media-item">
-                                <span class="icon">🎵</span>
-                                <span class="name">dumbstruckdynamics736.mp3</span>
-                                <span class="file-size">5.2 MB</span>
-                                <button class="track-menu-btn">⋮</button>
+                            <!-- Динамически заполняется через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ПАПКИ -->
+                <div class="tab-pane" id="tab-folders">
+                    <div class="pane-header">
+                        <span class="pane-title">Папки с аудио</span>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn">Сортировка: Название ▼</button>
+                            <div class="sort-menu">
+                                <div class="sort-item" data-sort="name">По названию</div>
+                                <div class="sort-item" data-sort="count">По количеству</div>
                             </div>
-                            <div class="media-item">
-                                <span class="icon">🎵</span>
-                                <span class="name">трек_2.flac</span>
-                                <span class="file-size">24.8 MB</span>
-                                <button class="track-menu-btn">⋮</button>
+                        </div>
+                    </div>
+                    <div class="media-window full-height">
+                        <div class="media-list">
+                            <!-- Динамически заполняется через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ПЛЕЙЛИСТЫ -->
+                <div class="tab-pane" id="tab-playlists">
+                    <div class="pane-header">
+                        <span class="pane-title">Плейлисты</span>
+                        <button id="create-playlist-btn" class="create-btn">+ Новый плейлист</button>
+                    </div>
+                    <div class="media-window full-height">
+                        <div class="media-list" id="playlists-list">
+                            <!-- Динамически заполняется через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- АЛЬБОМЫ -->
+                <div class="tab-pane" id="tab-albums">
+                    <div class="pane-header">
+                        <span class="pane-title">Альбомы</span>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn">Сортировка: Название ▼</button>
+                            <div class="sort-menu">
+                                <div class="sort-item" data-sort="name">По названию</div>
+                                <div class="sort-item" data-sort="artist">По артисту</div>
+                                <div class="sort-item" data-sort="count">По количеству</div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="media-window full-height">
+                        <div class="media-list">
+                            <!-- Динамически заполняется через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- АРТИСТ -->
+                <div class="tab-pane" id="tab-artists">
+                    <div class="pane-header">
+                        <span class="pane-title">Исполнители</span>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn">Сортировка: Имя ▼</button>
+                            <div class="sort-menu">
+                                <div class="sort-item" data-sort="name">По имени</div>
+                                <div class="sort-item" data-sort="count">По количеству</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="media-window full-height">
+                        <div class="media-list">
+                            <!-- Динамически заполняется через JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ЖАНРЫ -->
+                <div class="tab-pane" id="tab-genres">
+                    <div class="pane-header">
+                        <span class="pane-title">Жанры</span>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn">Сортировка: Название ▼</button>
+                            <div class="sort-menu">
+                                <div class="sort-item" data-sort="name">По названию</div>
+                                <div class="sort-item" data-sort="count">По количеству</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="media-window full-height">
+                        <div class="media-list">
+                            <!-- Динамически заполняется через JS -->
                         </div>
                     </div>
                 </div>
@@ -205,7 +270,7 @@
             </div>
         </div>
 
-        <!-- МОДАЛКА ОБРЕЗКИ ТРЕКА (ОБНОВЛЕННАЯ) -->
+        <!-- МОДАЛКА ОБРЕЗКИ ТРЕКА -->
         <div id="cut-track-modal" class="modal">
             <div class="modal-content cut-modal-content">
                 <h3>Укажите фрагмент трека</h3>
@@ -274,14 +339,7 @@
             <div class="modal-content">
                 <h3>Выберите плейлист</h3>
                 <div class="playlist-select-list" id="playlist-select-list">
-                    <div class="playlist-select-item">
-                        <span>Любимое</span>
-                        <button class="add-to-playlist-btn">+</button>
-                    </div>
-                    <div class="playlist-select-item">
-                        <span>В машину</span>
-                        <button class="add-to-playlist-btn">+</button>
-                    </div>
+                    <!-- Динамически заполняется через JS -->
                 </div>
                 <div class="modal-buttons">
                     <button id="close-playlist-select">Отмена</button>
