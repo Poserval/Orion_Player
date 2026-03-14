@@ -28,26 +28,20 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: |
+          npm install --legacy-peer-deps
+          npx cap init OrionPlayer com.orion.player --skip-npm
 
       - name: Prepare web directory
         run: |
-          # Создаём папку www для веб-файлов
           mkdir -p www
-          # Копируем все нужные файлы в www
           cp index.html www/
           cp style.css www/
           cp script.js www/
           cp -r assets www/
 
-      - name: Initialize Capacitor
-        run: |
-          # Удаляем старую android папку, если есть
-          rm -rf android
-          # Инициализируем, указывая правильный webDir
-          npx cap init OrionPlayer com.orion.player
-          # Устанавливаем правильный webDir в конфиге
-          sed -i 's/"webDir": "."/"webDir": "www"/' capacitor.config.json
+      - name: Update webDir in config
+        run: sed -i 's/"webDir": "."/"webDir": "www"/' capacitor.config.json
 
       - name: Add Android platform
         run: |
