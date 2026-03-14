@@ -1,0 +1,29 @@
+{
+  "appId": "com.orion.player",
+  "appName": "Orion Player",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true,
+    "allowNavigation": ["*"]
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  },
+  "plugins": {
+    "Filesystem": {
+      "permissions": {
+        "android": [
+          "android.permission.READ_EXTERNAL_STORAGE",
+          "android.permission.WRITE_EXTERNAL_STORAGE",
+          "android.permission.READ_MEDIA_AUDIO",
+          "android.permission.READ_MEDIA_VIDEO",
+          "android.permission.READ_MEDIA_IMAGES"
+        ]
+      }
+    }
+  }
+}
