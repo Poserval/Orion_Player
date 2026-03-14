@@ -16,6 +16,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadSubtitle = document.getElementById('load-subtitle');
     const subtitleFile = document.getElementById('subtitle-file');
     
+    // Элементы нового плеера
+    const playerCloseBtn = document.getElementById('player-close');
+    const playerTrackName = document.getElementById('player-track-name');
+    const playerTrackArtist = document.getElementById('player-track-artist');
+    const playerPlayPause = document.getElementById('player-play-pause');
+    const playerPrev = document.getElementById('player-prev');
+    const playerNext = document.getElementById('player-next');
+    const playerSpeed = document.getElementById('player-speed');
+    const playerCurrentTime = document.getElementById('player-current-time');
+    const playerDuration = document.getElementById('player-duration');
+    const playerProgressFill = document.getElementById('player-progress-fill');
+    const playerProgressHandle = document.getElementById('player-progress-handle');
+    const playerProgressBar = document.getElementById('player-progress-bar');
+    
     // Элементы страниц
     const pageMain = document.getElementById('page-main');
     const pageMusic = document.getElementById('page-music');
@@ -89,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPlaying = false;
     let currentTrack = null;
     let selectedTrack = null;
+    let playbackSpeed = 1.0;
     
     // Данные
     let allAudioFiles = [];
@@ -791,7 +806,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Код ошибки:', currentAudio.error ? currentAudio.error.code : 'unknown');
                 
                 if (currentAudio.error && currentAudio.error.code === 4) {
-                    // Пробуем альтернативный способ через полноэкранный плеер
                     openFullscreenPlayer(file, 0);
                 } else {
                     let errorMessage = 'Не удалось воспроизвести файл. ';
@@ -828,7 +842,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('Ошибка при попытке воспроизвести:', e);
                     
                     if (e.name === 'NotSupportedError') {
-                        // Если не поддерживается, открываем полноэкранный плеер
                         openFullscreenPlayer(file, 0);
                     } else {
                         alert('Не удалось воспроизвести файл: ' + e.message);
@@ -847,6 +860,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         playerScreen.style.display = 'block';
         app.style.display = 'none';
+        
+        // Обновляем информацию о треке
+        playerTrackName.textContent = file.displayName || file.title || 'Без названия';
+        playerTrackArtist.textContent = file.artist || 'Неизвестный исполнитель';
         
         let playableUrl;
         if (typeof Capacitor !== 'undefined') {
@@ -870,6 +887,22 @@ document.addEventListener('DOMContentLoaded', () => {
             audioPlayer.play().catch(e => console.error('Ошибка аудио:', e));
             if (subtitleBtn) subtitleBtn.style.display = 'none';
         }
+        
+        // Синхронизируем с currentAudio
+        if (currentAudio) {
+            currentAudio.pause();
+        }
+        currentAudio = file.mediaType === 'video' ? videoPlayer : audioPlayer;
+        currentTrack = file;
+        isPlaying = true;
+        
+        // Обновляем кнопку play/pause
+        if (playerPlayPause) playerPlayPause.textContent = '⏸';
+        
+        // Обновляем длительность
+        if (file.duration) {
+            playerDuration.textContent = formatDuration(file.duration);
+        }
     }
 
     function updateMiniPlayerTime() {
@@ -877,6 +910,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const current = formatTime(currentAudio.currentTime);
             const duration = formatTime(currentAudio.duration);
             miniTime.textContent = `${current} / ${duration}`;
+            
+            // Обновляем прогресс в полноэкранном плеере, если он открыт
+            if (playerScreen.style.display === 'block') {
+                updateFullscreenProgress();
+            }
+        }
+    }
+
+    function updateFullscreenProgress() {
+        if (currentAudio && playerCurrentTime && playerProgressFill && playerProgressHandle) {
+            const current = currentAudio.currentTime;
+            const duration = currentAudio.duration;
+            
+            playerCurrentTime.textContent = formatTime(current);
+            
+            if (duration && duration > 0) {
+                const percent = (current / duration) * 100;
+                playerProgressFill.style.width = `${percent}%`;
+                playerProgressHandle.style.left = `${percent}%`;
+            }
         }
     }
 
@@ -906,6 +959,71 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentTrack && currentAudio) {
                 const currentTime = currentAudio.currentTime;
                 openFullscreenPlayer(currentTrack, currentTime);
+            }
+        });
+    }
+
+    // ========== УПРАВЛЕНИЕ ПОЛНОЭКРАННЫМ ПЛЕЕРОМ ==========
+    if (playerCloseBtn) {
+        playerCloseBtn.addEventListener('click', exitPlayer);
+    }
+
+    if (playerPlayPause) {
+        playerPlayPause.addEventListener('click', () => {
+            if (currentAudio) {
+                if (isPlaying) {
+                    currentAudio.pause();
+                    playerPlayPause.textContent = '▶';
+                    if (miniPlayPause) miniPlayPause.textContent = '▶';
+                } else {
+                    currentAudio.play();
+                    playerPlayPause.textContent = '⏸';
+                    if (miniPlayPause) miniPlayPause.textContent = '⏸';
+                }
+                isPlaying = !isPlaying;
+            }
+        });
+    }
+
+    if (playerPrev) {
+        playerPrev.addEventListener('click', () => {
+            // В следующей версии - переключение на предыдущий трек
+            console.log('Предыдущий трек');
+        });
+    }
+
+    if (playerNext) {
+        playerNext.addEventListener('click', () => {
+            // В следующей версии - переключение на следующий трек
+            console.log('Следующий трек');
+        });
+    }
+
+    if (playerSpeed) {
+        playerSpeed.addEventListener('click', () => {
+            const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+            const currentIndex = speeds.indexOf(playbackSpeed);
+            const nextIndex = (currentIndex + 1) % speeds.length;
+            playbackSpeed = speeds[nextIndex];
+            
+            playerSpeed.textContent = playbackSpeed + 'x';
+            
+            if (currentAudio) {
+                currentAudio.playbackRate = playbackSpeed;
+            }
+        });
+    }
+
+    if (playerProgressBar) {
+        playerProgressBar.addEventListener('click', (e) => {
+            if (currentAudio && currentAudio.duration) {
+                const rect = playerProgressBar.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const percent = clickX / rect.width;
+                const newTime = percent * currentAudio.duration;
+                
+                currentAudio.currentTime = newTime;
+                updateFullscreenProgress();
             }
         });
     }
@@ -952,7 +1070,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('backbutton', handleBackButton, false);
-
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             handleBackButton();
@@ -985,12 +1102,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase().trim();
-
             const activeTab = document.querySelector('.tab-pane.active-pane');
             if (!activeTab) return;
 
             const mediaItems = activeTab.querySelectorAll('.media-item, .folder-item, .playlist-item');
-
             mediaItems.forEach(item => {
                 const name = item.querySelector('.name')?.textContent.toLowerCase() || '';
                 if (query === '' || name.includes(query)) {
@@ -1005,7 +1120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchClear) {
         searchClear.addEventListener('click', () => {
             searchInput.value = '';
-
             const activeTab = document.querySelector('.tab-pane.active-pane');
             if (activeTab) {
                 const mediaItems = activeTab.querySelectorAll('.media-item, .folder-item, .playlist-item');
@@ -1013,7 +1127,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.style.display = 'flex';
                 });
             }
-
             searchInput.focus();
         });
     }
@@ -1026,7 +1139,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 tab.classList.add('active-tab');
 
                 const tabName = tab.getAttribute('data-tab');
-
                 document.querySelectorAll('.tab-pane').forEach(pane => {
                     pane.classList.remove('active-pane');
                 });
@@ -1102,28 +1214,20 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.track-menu-item').forEach(item => {
         item.addEventListener('click', async (e) => {
             const action = item.getAttribute('data-action');
-            
             trackMenuModal.classList.remove('active');
             
             switch(action) {
                 case 'add-to-playlist':
                     if (addToPlaylistModal) addToPlaylistModal.classList.add('active');
                     break;
-                    
                 case 'share':
                     if (shareModal) shareModal.classList.add('active');
                     break;
-                    
                 case 'set-ringtone':
                     if (selectedTrack?.data) {
-                        try {
-                            alert('Функция установки рингтона будет доступна в следующей версии');
-                        } catch (e) {
-                            console.error('Ошибка:', e);
-                        }
+                        alert('Функция установки рингтона будет доступна в следующей версии');
                     }
                     break;
-                    
                 case 'edit-tags':
                     if (editTagsModal && selectedTrack?.data) {
                         editTitle.value = selectedTrack.data.title || '';
@@ -1133,14 +1237,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         editTagsModal.classList.add('active');
                     }
                     break;
-                    
                 case 'cut-track':
                     if (cutTrackModal && selectedTrack?.data) {
                         document.getElementById('cut-track-title').textContent = selectedTrack.name;
                         cutTrackModal.classList.add('active');
                     }
                     break;
-                    
                 case 'delete':
                     if (selectedTrack && confirm(`Удалить "${selectedTrack.name}" с телефона?`)) {
                         alert('Функция удаления будет доступна в следующей версии');
@@ -1160,7 +1262,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (saveTagsBtn) {
         saveTagsBtn.addEventListener('click', async () => {
             if (!selectedTrack?.data) return;
-            
             try {
                 alert('Сохранение тегов будет доступно в следующей версии');
                 editTagsModal.classList.remove('active');
@@ -1280,8 +1381,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ========== ТЕСТОВЫЕ ДАННЫЕ ==========
     function loadTestData() {
         allAudioFiles = [
-            { displayName: 'трек_1.mp3', size: 5242880, uri: 'test://1', id: '1', duration: 213000, mediaType: 'audio' },
-            { displayName: 'трек_2.flac', size: 26214400, uri: 'test://2', id: '2', duration: 312000, mediaType: 'audio' }
+            { displayName: 'Песня 9. Настроение май ...', size: 5242880, uri: 'test://1', id: '1', duration: 213000, mediaType: 'audio', artist: 'dumbstruckdynamics736' },
+            { displayName: 'трек_2.flac', size: 26214400, uri: 'test://2', id: '2', duration: 312000, mediaType: 'audio', artist: 'Исполнитель 2' }
         ];
         
         allFolders = [
@@ -1296,7 +1397,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         allArtists = [
             { name: 'Исполнитель 1', count: 15 },
-            { name: 'Исполнитель 2', count: 8 }
+            { name: 'dumbstruckdynamics736', count: 8 }
         ];
         
         allGenres = [
