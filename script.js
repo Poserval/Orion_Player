@@ -20,9 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageMain = document.getElementById('page-main');
     const pageMusic = document.getElementById('page-music');
     const musicBtn = document.getElementById('music-btn');
-    const videoBtn = document.getElementById('video-btn'); // если есть
-    const imagesBtn = document.getElementById('images-btn'); // если есть
-    const audiobooksBtn = document.getElementById('audiobooks-btn'); // если есть
     const backToMain = document.getElementById('back-to-main');
 
     // Элементы вкладок
@@ -114,25 +111,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ========== ИСТОРИЯ НАВИГАЦИИ ==========
-    let navigationStack = ['main']; // текущий стек навигации
+    let navigationStack = ['main'];
 
     function navigateTo(page) {
         console.log('Навигация на:', page);
         
-        // Скрываем все страницы
         pageMain.classList.remove('active-page');
         pageMusic.classList.remove('active-page');
-        // если есть другие страницы - добавить
         
-        // Показываем нужную
         if (page === 'main') {
             pageMain.classList.add('active-page');
         } else if (page === 'music') {
             pageMusic.classList.add('active-page');
         }
-        // else if (page === 'video') и т.д.
         
-        // Добавляем в стек, если это не текущая страница
         if (navigationStack[navigationStack.length - 1] !== page) {
             navigationStack.push(page);
         }
@@ -143,18 +135,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function goBack() {
         console.log('Назад, текущий стек:', navigationStack);
         
-        // Если в стеке больше одного элемента
         if (navigationStack.length > 1) {
-            // Убираем текущий
             navigationStack.pop();
-            // Переходим на предыдущий
             const previousPage = navigationStack[navigationStack.length - 1];
             
-            // Скрываем все страницы
             pageMain.classList.remove('active-page');
             pageMusic.classList.remove('active-page');
             
-            // Показываем предыдущую
             if (previousPage === 'main') {
                 pageMain.classList.add('active-page');
             } else if (previousPage === 'music') {
@@ -164,8 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Возврат на:', previousPage);
         } else {
             console.log('Выход из приложения');
-            // Здесь можно либо выйти, либо ничего не делать
-            // navigator.app.exitApp();
         }
     }
 
@@ -188,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const cachedTime = localStorage.getItem(CACHE_KEYS.TIMESTAMP);
         const now = Date.now();
         
-        // Если кэш свежий (меньше часа), грузим из него
         if (cachedTime && (now - parseInt(cachedTime)) < 3600000) {
             console.log('Загружаем из кэша...');
             loadFromCache();
@@ -197,10 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await requestPermissionsAndLoadFiles();
         }
         
-        // Загружаем плейлисты (они всегда из кэша)
         loadPlaylists();
-        
-        // Начальная страница - главная
         navigationStack = ['main'];
     }
 
@@ -223,7 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 recent: recentMediaFiles.length
             });
             
-            // Обновляем UI
             updateAllCounters();
             renderAllAudioFiles();
             renderFolders();
@@ -271,14 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Запрашиваем разрешения
             console.log('Запрашиваем разрешения...');
             const permissions = await CapacitorMediaStore.requestPermissions({
                 types: ['audio', 'images', 'video']
             });
             console.log('Разрешения получены:', permissions);
 
-            // Загружаем все данные параллельно
             await Promise.all([
                 loadAllAudioFiles(CapacitorMediaStore),
                 loadFolders(CapacitorMediaStore),
@@ -288,7 +266,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadRecentMediaFiles(CapacitorMediaStore)
             ]);
 
-            // Сохраняем в кэш
             saveToCache();
 
         } catch (error) {
@@ -322,7 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ========== ЗАГРУЗКА ПАПОК ==========
     async function loadFolders(mediaStore) {
         try {
-            // Получаем уникальные пути из аудиофайлов
             const folderMap = new Map();
             
             allAudioFiles.forEach(file => {
@@ -682,7 +658,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <button class="track-menu-btn">⋮</button>
         `;
 
-        // Сохраняем данные
         item.dataset.fileId = file.id;
         item.dataset.filePath = file.uri || file.path;
         item.dataset.fileType = type;
@@ -717,7 +692,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ========== ПРИКРЕПЛЕНИЕ ОБРАБОТЧИКОВ ==========
     function attachMediaItemHandlers() {
-        // Воспроизведение
         document.querySelectorAll('.media-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 if (e.target.closest('.track-menu-btn')) return;
@@ -734,7 +708,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Меню трека
         document.querySelectorAll('.track-menu-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -760,8 +733,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ========== ПЛЕЕР ==========
-    function playMedia(file) {
+    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ВОСПРОИЗВЕДЕНИЯ ==========
+    async function playMedia(file) {
         console.log('Попытка воспроизведения:', file);
 
         if (!file || !file.uri) {
@@ -771,20 +744,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // Останавливаем предыдущее
             if (currentAudio) {
                 currentAudio.pause();
                 currentAudio = null;
             }
 
-            // Создаем новый Audio объект с правильным URI
-            const audioPath = file.uri.startsWith('content://') 
-                ? file.uri 
-                : `content://media/external/audio/media/${file.id}`;
+            // КОНВЕРТИРУЕМ URI В ДОСТУПНЫЙ ДЛЯ WEBVIEW URL
+            let playableUrl;
             
-            console.log('Путь для воспроизведения:', audioPath);
+            if (typeof Capacitor !== 'undefined') {
+                // Используем Capacitor для конвертации URI
+                if (file.uri.startsWith('content://')) {
+                    playableUrl = Capacitor.convertFileSrc(file.uri);
+                } else {
+                    // Пробуем через Filesystem плагин
+                    try {
+                        const { Filesystem, Directory } = Capacitor.Plugins;
+                        const result = await Filesystem.getUri({
+                            path: file.uri,
+                            directory: Directory.External
+                        });
+                        playableUrl = Capacitor.convertFileSrc(result.uri);
+                    } catch (fsError) {
+                        console.error('Ошибка Filesystem:', fsError);
+                        playableUrl = file.uri;
+                    }
+                }
+            } else {
+                playableUrl = file.uri;
+            }
             
-            currentAudio = new Audio(audioPath);
+            console.log('Playable URL:', playableUrl);
+            
+            // Создаем новый Audio объект с правильным URL
+            currentAudio = new Audio(playableUrl);
             currentTrack = file;
 
             // Обновляем мини-плеер
@@ -794,17 +787,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Обработчики событий
             currentAudio.addEventListener('timeupdate', updateMiniPlayerTime);
+            
             currentAudio.addEventListener('loadedmetadata', () => {
                 console.log('Метаданные загружены, длительность:', currentAudio.duration);
                 updateMiniPlayerTime();
             });
+            
             currentAudio.addEventListener('ended', () => {
                 isPlaying = false;
                 miniPlayPause.textContent = '▶';
             });
+            
             currentAudio.addEventListener('error', (e) => {
                 console.error('Ошибка воспроизведения:', e);
-                alert('Не удалось воспроизвести файл. Возможно, формат не поддерживается.');
+                console.error('Код ошибки:', currentAudio.error ? currentAudio.error.code : 'unknown');
+                
+                let errorMessage = 'Не удалось воспроизвести файл. ';
+                if (currentAudio.error) {
+                    switch(currentAudio.error.code) {
+                        case MediaError.MEDIA_ERR_ABORTED:
+                            errorMessage += 'Воспроизведение прервано.';
+                            break;
+                        case MediaError.MEDIA_ERR_NETWORK:
+                            errorMessage += 'Сетевая ошибка.';
+                            break;
+                        case MediaError.MEDIA_ERR_DECODE:
+                            errorMessage += 'Формат не поддерживается или файл поврежден.';
+                            break;
+                        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                            errorMessage += 'Формат не поддерживается браузером.';
+                            break;
+                        default:
+                            errorMessage += 'Неизвестная ошибка.';
+                    }
+                }
+                alert(errorMessage);
             });
 
             // Запускаем
@@ -816,12 +833,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .catch(e => {
                     console.error('Ошибка при попытке воспроизвести:', e);
-                    alert('Не удалось воспроизвести файл: ' + e.message);
+                    
+                    let errorMessage = 'Не удалось воспроизвести файл. ';
+                    if (e.name === 'NotAllowedError') {
+                        errorMessage += 'Пользователь не взаимодействовал с документом.';
+                    } else if (e.name === 'NotSupportedError') {
+                        errorMessage += 'Формат не поддерживается.';
+                    } else {
+                        errorMessage += e.message;
+                    }
+                    alert(errorMessage);
                 });
 
         } catch (e) {
             console.error('Критическая ошибка в playMedia:', e);
-            alert('Ошибка при подготовке воспроизведения');
+            alert('Ошибка при подготовке воспроизведения: ' + e.message);
         }
     }
 
@@ -857,24 +883,38 @@ document.addEventListener('DOMContentLoaded', () => {
     if (miniPlayer) {
         miniPlayer.addEventListener('click', () => {
             if (currentTrack && currentAudio) {
-                // Сохраняем текущую позицию
                 const currentTime = currentAudio.currentTime;
                 
-                // Показываем полноэкранный плеер
                 playerScreen.style.display = 'block';
                 app.style.display = 'none';
                 
                 if (currentTrack.mediaType === 'video') {
                     videoPlayer.style.display = 'block';
                     audioPlayer.style.display = 'none';
-                    videoPlayer.src = currentTrack.uri || currentTrack.path;
+                    
+                    let videoUrl;
+                    if (typeof Capacitor !== 'undefined' && currentTrack.uri) {
+                        videoUrl = Capacitor.convertFileSrc(currentTrack.uri);
+                    } else {
+                        videoUrl = currentTrack.uri || currentTrack.path;
+                    }
+                    
+                    videoPlayer.src = videoUrl;
                     videoPlayer.currentTime = currentTime;
                     videoPlayer.play().catch(e => console.error('Ошибка видео:', e));
                     if (subtitleBtn) subtitleBtn.style.display = 'block';
                 } else {
                     audioPlayer.style.display = 'block';
                     videoPlayer.style.display = 'none';
-                    audioPlayer.src = currentTrack.uri || currentTrack.path;
+                    
+                    let audioUrl;
+                    if (typeof Capacitor !== 'undefined' && currentTrack.uri) {
+                        audioUrl = Capacitor.convertFileSrc(currentTrack.uri);
+                    } else {
+                        audioUrl = currentTrack.uri || currentTrack.path;
+                    }
+                    
+                    audioPlayer.src = audioUrl;
                     audioPlayer.currentTime = currentTime;
                     audioPlayer.play().catch(e => console.error('Ошибка аудио:', e));
                     if (subtitleBtn) subtitleBtn.style.display = 'none';
@@ -883,18 +923,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ========== ФУНКЦИЯ ВЫХОДА ИЗ ПЛЕЕРА ==========
+    // ========== ВЫХОД ИЗ ПЛЕЕРА ==========
     function exitPlayer() {
         if (playerScreen && playerScreen.style.display === 'block') {
             console.log('Закрываем полноэкранный плеер');
             
-            // Скрываем плеер
             playerScreen.style.display = 'none';
-            
-            // Показываем основное приложение
             app.style.display = 'flex';
             
-            // Останавливаем воспроизведение
             if (videoPlayer) {
                 videoPlayer.pause();
                 videoPlayer.src = '';
@@ -912,14 +948,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleBackButton() {
         console.log('Системная кнопка назад нажата');
         
-        // Проверяем, открыт ли полноэкранный плеер
         if (playerScreen && playerScreen.style.display === 'block') {
             console.log('Закрываем полноэкранный плеер');
             exitPlayer();
             return;
         }
         
-        // Проверяем, открыта ли какая-то модалка
         const activeModal = document.querySelector('.modal.active');
         if (activeModal) {
             console.log('Закрываем модалку');
@@ -927,14 +961,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // Используем стек навигации
         goBack();
     }
 
-    // Регистрируем обработчик для системной кнопки назад
     document.addEventListener('backbutton', handleBackButton, false);
 
-    // Также обрабатываем клавишу Escape для десктопного тестирования
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             handleBackButton();
@@ -953,13 +984,6 @@ document.addEventListener('DOMContentLoaded', () => {
             navigateTo('main');
         });
     }
-
-    // Добавь аналогично для других кнопок (видео, изображения, аудиокниги)
-    // if (videoBtn) {
-    //     videoBtn.addEventListener('click', () => {
-    //         navigateTo('video');
-    //     });
-    // }
 
     // ========== ПОИСК ==========
     if (searchToggle) {
@@ -1072,7 +1096,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         break;
                 }
 
-                // Обновляем текст кнопки
                 const sortBtn = pane.querySelector('.sort-btn');
                 if (sortBtn) {
                     const sortText = e.target.textContent;
