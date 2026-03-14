@@ -105,17 +105,13 @@ document.addEventListener('DOMContentLoaded', () => {
         TIMESTAMP: 'orion_timestamp'
     };
 
-    // ========== CAPACITOR MEDIA ДЛЯ СИСТЕМНОГО МЕНЮ ==========
-    async function setupMediaSession(file, audioElement) {
-        if (typeof Capacitor === 'undefined') return;
-        
-        try {
-            const { Media } = Capacitor.Plugins;
+    // ========== MEDIA SESSION API (ДЛЯ СИСТЕМНОГО МЕНЮ) ==========
+    function setupMediaSession(file, audioElement) {
+        if ('mediaSession' in navigator) {
+            console.log('Настраиваем MediaSession для:', file.displayName);
             
-            if (!Media) return;
-
-            // Регистрируем медиа-сессию
-            await Media.setMetadata({
+            // Метаданные
+            navigator.mediaSession.metadata = new MediaMetadata({
                 title: file.displayName || file.title || 'Без названия',
                 artist: file.artist || 'Неизвестный исполнитель',
                 album: file.album || '',
@@ -125,46 +121,57 @@ document.addEventListener('DOMContentLoaded', () => {
                     { src: 'assets/images/icon-header.png', sizes: '192x192', type: 'image/png' },
                     { src: 'assets/images/icon-header.png', sizes: '256x256', type: 'image/png' },
                     { src: 'assets/images/icon-header.png', sizes: '512x512', type: 'image/png' }
-                ],
-                duration: file.duration ? file.duration / 1000 : 0
+                ]
             });
 
-            // Обработчики системных кнопок
-            Media.addListener('play', () => {
-                if (audioElement) {
-                    audioElement.play();
-                    isPlaying = true;
-                    miniPlayPause.textContent = '⏸';
+            // Обработчики кнопок
+            navigator.mediaSession.setActionHandler('play', () => {
+                console.log('MediaSession: play');
+                audioElement.play();
+            });
+
+            navigator.mediaSession.setActionHandler('pause', () => {
+                console.log('MediaSession: pause');
+                audioElement.pause();
+            });
+
+            navigator.mediaSession.setActionHandler('previoustrack', () => {
+                console.log('MediaSession: previous');
+                // TODO: предыдущий трек
+            });
+
+            navigator.mediaSession.setActionHandler('nexttrack', () => {
+                console.log('MediaSession: next');
+                // TODO: следующий трек
+            });
+
+            navigator.mediaSession.setActionHandler('seekbackward', () => {
+                console.log('MediaSession: seek backward');
+                audioElement.currentTime = Math.max(0, audioElement.currentTime - 10);
+            });
+
+            navigator.mediaSession.setActionHandler('seekforward', () => {
+                console.log('MediaSession: seek forward');
+                audioElement.currentTime = Math.min(audioElement.duration, audioElement.currentTime + 10);
+            });
+
+            // Обновляем позицию
+            audioElement.addEventListener('timeupdate', () => {
+                if ('mediaSession' in navigator) {
+                    try {
+                        navigator.mediaSession.setPositionState({
+                            duration: audioElement.duration || 0,
+                            playbackRate: audioElement.playbackRate || 1,
+                            position: audioElement.currentTime || 0
+                        });
+                    } catch (e) {
+                        console.warn('Ошибка setPositionState:', e);
+                    }
                 }
             });
 
-            Media.addListener('pause', () => {
-                if (audioElement) {
-                    audioElement.pause();
-                    isPlaying = false;
-                    miniPlayPause.textContent = '▶';
-                }
-            });
-
-            Media.addListener('seekTo', (info) => {
-                if (audioElement && info.time !== undefined) {
-                    audioElement.currentTime = info.time;
-                }
-            });
-
-            Media.addListener('next', () => {
-                console.log('Следующий трек - в разработке');
-            });
-
-            Media.addListener('previous', () => {
-                console.log('Предыдущий трек - в разработке');
-            });
-
-            // Обновляем состояние воспроизведения
-            Media.setPlaybackState({ state: isPlaying ? 'playing' : 'paused' });
-
-        } catch (error) {
-            console.error('Ошибка настройки Media:', error);
+            // Устанавливаем состояние
+            navigator.mediaSession.playbackState = 'playing';
         }
     }
 
@@ -740,6 +747,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ========== ФУНКЦИЯ ВОСПРОИЗВЕДЕНИЯ ==========
     async function playMedia(file) {
+        console.log('Воспроизведение:', file);
+
         if (!file || !file.uri) {
             alert('Не удалось воспроизвести файл: путь не найден');
             return;
@@ -751,57 +760,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentAudio = null;
             }
 
+            // КОНВЕРТИРУЕМ URI В ДОСТУПНЫЙ ДЛЯ WEBVIEW URL
             let playableUrl;
             if (typeof Capacitor !== 'undefined') {
                 playableUrl = Capacitor.convertFileSrc(file.uri);
+                console.log('Сконвертированный URL:', playableUrl);
             } else {
                 playableUrl = file.uri;
             }
             
+            // Создаем новый Audio объект
             currentAudio = new Audio(playableUrl);
             currentTrack = file;
 
+            // Обновляем мини-плеер
             miniIcon.textContent = '🎵';
             miniTrackName.textContent = file.displayName || file.title || 'Трек';
             miniPlayer.classList.remove('hidden');
 
-            // Настраиваем MediaSession через Capacitor
-            await setupMediaSession(file, currentAudio);
-
+            // Обработчики событий
             currentAudio.addEventListener('timeupdate', () => {
                 const current = formatTime(currentAudio.currentTime);
                 const duration = formatTime(currentAudio.duration);
                 miniTime.textContent = `${current} / ${duration}`;
-                
-                // Обновляем позицию в системном меню
-                if (typeof Capacitor !== 'undefined' && Capacitor.Plugins.Media) {
-                    Capacitor.Plugins.Media.setPlaybackPosition({
-                        position: currentAudio.currentTime
-                    });
-                }
             });
             
             currentAudio.addEventListener('ended', () => {
                 isPlaying = false;
                 miniPlayPause.textContent = '▶';
-                if (typeof Capacitor !== 'undefined' && Capacitor.Plugins.Media) {
-                    Capacitor.Plugins.Media.setPlaybackState({ state: 'paused' });
+                if ('mediaSession' in navigator) {
+                    navigator.mediaSession.playbackState = 'paused';
                 }
             });
 
+            currentAudio.addEventListener('error', (e) => {
+                console.error('Ошибка аудио:', e);
+                // Не показываем ошибку, если файл все-таки играет
+            });
+
+            // Запускаем
             currentAudio.play()
                 .then(() => {
                     isPlaying = true;
                     miniPlayPause.textContent = '⏸';
-                    if (typeof Capacitor !== 'undefined' && Capacitor.Plugins.Media) {
-                        Capacitor.Plugins.Media.setPlaybackState({ state: 'playing' });
-                    }
+                    
+                    // НАСТРАИВАЕМ MEDIA SESSION
+                    setupMediaSession(file, currentAudio);
+                    
+                    console.log('Воспроизведение начато');
                 })
                 .catch(e => {
-                    alert('Не удалось воспроизвести файл. Формат не поддерживается.');
+                    console.error('Ошибка воспроизведения:', e);
+                    // Не показываем алерт, просто логируем
                 });
 
-        } catch (e) {}
+        } catch (e) {
+            console.error('Критическая ошибка:', e);
+        }
     }
 
     // Управление мини-плеером
@@ -813,18 +828,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isPlaying) {
                     currentAudio.pause();
                     miniPlayPause.textContent = '▶';
-                    if (typeof Capacitor !== 'undefined' && Capacitor.Plugins.Media) {
-                        Capacitor.Plugins.Media.setPlaybackState({ state: 'paused' });
+                    if ('mediaSession' in navigator) {
+                        navigator.mediaSession.playbackState = 'paused';
                     }
                 } else {
                     currentAudio.play()
                         .then(() => {
                             miniPlayPause.textContent = '⏸';
-                            if (typeof Capacitor !== 'undefined' && Capacitor.Plugins.Media) {
-                                Capacitor.Plugins.Media.setPlaybackState({ state: 'playing' });
+                            if ('mediaSession' in navigator) {
+                                navigator.mediaSession.playbackState = 'playing';
                             }
                         })
-                        .catch(e => {});
+                        .catch(e => console.error('Ошибка:', e));
                 }
                 isPlaying = !isPlaying;
             }
