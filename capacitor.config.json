@@ -1,7 +1,7 @@
 {
   "appId": "com.orion.player",
   "appName": "Orion Player",
-  "webDir": ".",
+  "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
     "androidScheme": "https",
@@ -29,6 +29,11 @@
           "android.permission.READ_MEDIA_VIDEO",
           "android.permission.READ_MEDIA_IMAGES"
         ]
+      }
+    },
+    "Media": {
+      "permissions": {
+        "android": []
       }
     }
   }
