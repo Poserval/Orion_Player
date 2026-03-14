@@ -1,482 +1,780 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Orion Player</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <!-- ЗАСТАВКА -->
-    <div id="splash-screen">
-        <img src="assets/images/orion_splash.png" alt="Orion Player" class="splash-image">
-    </div>
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM загружен');
 
-    <!-- ФОН -->
-    <div class="background-constellation">
-        <img src="assets/images/orion_bg.png" alt="Orion Background" class="bg-image">
-    </div>
+    // Элементы
+    const splash = document.getElementById('splash-screen');
+    const app = document.getElementById('app');
+    const modal = document.getElementById('link-modal');
+    const addLinkBtn = document.getElementById('add-link-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const playUrlBtn = document.getElementById('play-url-btn');
+    const urlInput = document.getElementById('url-input');
+    const playerScreen = document.getElementById('player-screen');
+    const videoPlayer = document.getElementById('video-player');
+    const audioPlayer = document.getElementById('audio-player');
+    const subtitleBtn = document.getElementById('subtitle-btn');
+    const loadSubtitle = document.getElementById('load-subtitle');
+    const subtitleFile = document.getElementById('subtitle-file');
+    
+    // Элементы страниц
+    const pageMain = document.getElementById('page-main');
+    const pageMusic = document.getElementById('page-music');
+    const musicBtn = document.getElementById('music-btn');
+    const backToMain = document.getElementById('back-to-main');
 
-    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
-    <div id="app">
-        <!-- ХЕДЕР -->
-        <div class="top-icon">
-            <img src="assets/images/icon-header.png" alt="Orion">
-        </div>
+    // Элементы вкладок
+    const tabItems = document.querySelectorAll('.tab-item:not(.edit-tab)');
+    const editTabsBtn = document.getElementById('edit-tabs-btn');
+    const editTabsModal = document.getElementById('edit-tabs-modal');
+    const closeEditModalBtn = document.getElementById('close-edit-modal-btn');
+    const saveTabsBtn = document.getElementById('save-tabs-btn');
+    const editTabsList = document.getElementById('edit-tabs-list');
+    const tabsScroll = document.getElementById('tabs-scroll');
 
-        <!-- СТРАНИЦА 1 - ГЛАВНАЯ -->
-        <div id="page-main" class="page active-page">
-            <div class="category-grid">
-                <div class="category-btn" data-category="music" id="music-btn">
-                    <span>Музыка</span>
-                </div>
-                <div class="category-btn" data-category="video">
-                    <span>Видео</span>
-                </div>
-                <div class="category-btn" data-category="images">
-                    <span>Изображения</span>
-                </div>
-                <div class="category-btn" data-category="audiobooks">
-                    <span>Аудиокниги</span>
-                </div>
-            </div>
+    // Элементы поиска
+    const searchToggle = document.getElementById('search-toggle');
+    const searchBar = document.getElementById('search-bar');
+    const searchInput = document.getElementById('search-input');
+    const searchClear = document.getElementById('search-clear');
 
-            <div class="section-divider">
-                <span class="divider-text">Недавно добавленные</span>
-            </div>
+    // Элементы плейлистов
+    const createPlaylistBtn = document.getElementById('create-playlist-btn');
+    const newPlaylistModal = document.getElementById('new-playlist-modal');
+    const playlistName = document.getElementById('playlist-name');
+    const createPlaylistConfirm = document.getElementById('create-playlist-confirm');
+    const closePlaylistModal = document.getElementById('close-playlist-modal');
 
-            <div class="media-window">
-                <div class="media-list" id="media-list">
-                    <!-- 15 ТЕСТОВЫХ ФАЙЛОВ С ТРЕМЯ ТОЧКАМИ -->
-                    <div class="media-item">
-                        <span class="icon">🎬</span>
-                        <span class="name">видео_20250313.mp4</span>
-                        <span class="file-size">15.2 MB</span>
+    // Элементы мини-плеера
+    const miniPlayer = document.getElementById('mini-player');
+    const miniIcon = document.getElementById('mini-icon');
+    const miniTrackName = document.getElementById('mini-track-name');
+    const miniPlayPause = document.getElementById('mini-play-pause');
+    const miniTime = document.getElementById('mini-time');
+
+    // Элементы меню трека
+    const trackMenuModal = document.getElementById('track-menu-modal');
+    const closeTrackMenu = document.getElementById('close-track-menu');
+    const trackMenuTitle = document.getElementById('track-menu-title');
+    
+    // Элементы модалок
+    const editTagsModal = document.getElementById('edit-tags-modal');
+    const closeTagsModal = document.getElementById('close-tags-modal');
+    const saveTagsBtn = document.getElementById('save-tags-btn');
+    
+    const cutTrackModal = document.getElementById('cut-track-modal');
+    const closeCutModal = document.getElementById('close-cut-modal');
+    const saveCutBtn = document.getElementById('save-cut-btn');
+    const startSlider = document.getElementById('start-slider');
+    const endSlider = document.getElementById('end-slider');
+    const startTime = document.getElementById('start-time');
+    const endTime = document.getElementById('end-time');
+    
+    const addToPlaylistModal = document.getElementById('add-to-playlist-modal');
+    const closePlaylistSelect = document.getElementById('close-playlist-select');
+    
+    const shareModal = document.getElementById('share-modal');
+    const closeShareModal = document.getElementById('close-share-modal');
+
+    // Состояние
+    let currentAudio = null;
+    let isPlaying = false;
+    let currentTrack = null;
+    let selectedTrack = null;
+
+    // Заставка 5 секунд
+    if (splash) {
+        setTimeout(() => {
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 500);
+        }, 5000);
+    }
+
+    // Переключение на страницу Музыка
+    if (musicBtn) {
+        musicBtn.addEventListener('click', () => {
+            console.log('Музыка нажата');
+            pageMain.classList.remove('active-page');
+            pageMusic.classList.add('active-page');
+        });
+    }
+
+    // Возврат на главную
+    if (backToMain) {
+        backToMain.addEventListener('click', () => {
+            console.log('Назад на главную');
+            pageMusic.classList.remove('active-page');
+            pageMain.classList.add('active-page');
+        });
+    }
+
+    // ========== ПОИСК ==========
+    if (searchToggle) {
+        searchToggle.addEventListener('click', () => {
+            searchBar.classList.toggle('hidden');
+            if (!searchBar.classList.contains('hidden')) {
+                searchInput.focus();
+            }
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            
+            const activeTab = document.querySelector('.tab-pane.active-pane');
+            if (!activeTab) return;
+            
+            const mediaItems = activeTab.querySelectorAll('.media-item, .folder-item, .playlist-item');
+            
+            mediaItems.forEach(item => {
+                const name = item.querySelector('.name')?.textContent.toLowerCase() || '';
+                if (query === '' || name.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    if (searchClear) {
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            
+            const activeTab = document.querySelector('.tab-pane.active-pane');
+            if (activeTab) {
+                const mediaItems = activeTab.querySelectorAll('.media-item, .folder-item, .playlist-item');
+                mediaItems.forEach(item => {
+                    item.style.display = 'flex';
+                });
+            }
+            
+            searchInput.focus();
+        });
+    }
+
+    // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
+    if (tabItems.length > 0) {
+        tabItems.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabItems.forEach(t => t.classList.remove('active-tab'));
+                tab.classList.add('active-tab');
+                
+                const tabName = tab.getAttribute('data-tab');
+                
+                document.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove('active-pane');
+                });
+                
+                const activePane = document.getElementById(`tab-${tabName}`);
+                if (activePane) {
+                    activePane.classList.add('active-pane');
+                }
+
+                if (searchBar) {
+                    searchBar.classList.add('hidden');
+                    if (searchInput) searchInput.value = '';
+                }
+            });
+        });
+    }
+
+    // ========== СОРТИРОВКА ==========
+    const sortItems = document.querySelectorAll('.sort-item');
+    sortItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            const sortType = e.target.getAttribute('data-sort');
+            const pane = e.target.closest('.tab-pane');
+            if (!pane) return;
+            
+            const mediaList = pane.querySelector('.media-list');
+            if (!mediaList) return;
+            
+            const items = Array.from(mediaList.children);
+            
+            items.sort((a, b) => {
+                const nameA = a.querySelector('.name')?.textContent || '';
+                const nameB = b.querySelector('.name')?.textContent || '';
+                return nameA.localeCompare(nameB);
+            });
+            
+            mediaList.innerHTML = '';
+            items.forEach(item => mediaList.appendChild(item));
+            
+            const sortBtn = pane.querySelector('.sort-btn');
+            if (sortBtn) {
+                sortBtn.textContent = `Сортировка: ${e.target.textContent} ▼`;
+            }
+        });
+    });
+
+    // ========== ПЛЕЙЛИСТЫ ==========
+    if (createPlaylistBtn) {
+        createPlaylistBtn.addEventListener('click', () => {
+            if (newPlaylistModal) {
+                newPlaylistModal.classList.add('active');
+                if (playlistName) {
+                    playlistName.value = '';
+                    playlistName.focus();
+                }
+            }
+        });
+    }
+
+    if (createPlaylistConfirm) {
+        createPlaylistConfirm.addEventListener('click', () => {
+            const name = playlistName ? playlistName.value.trim() : '';
+            if (name) {
+                const playlistsList = document.getElementById('playlists-list');
+                if (playlistsList) {
+                    const newPlaylist = document.createElement('div');
+                    newPlaylist.className = 'playlist-item';
+                    newPlaylist.innerHTML = `
+                        <span class="icon">📋</span>
+                        <span class="name">${name}</span>
+                        <span class="file-count">0 треков</span>
                         <button class="track-menu-btn">⋮</button>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎵</span>
-                        <span class="name">трек_вчера.mp3</span>
-                        <span class="file-size">5.2 MB</span>
-                        <button class="track-menu-btn">⋮</button>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎧</span>
-                        <span class="name">книга_глава_3.mp3</span>
-                        <span class="file-size">28.4 MB</span>
-                        <button class="track-menu-btn">⋮</button>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎬</span>
-                        <span class="name">видос_с_работы.mp4</span>
-                        <span class="file-size">45.1 MB</span>
-                        <button class="track-menu-btn">⋮</button>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎵</span>
-                        <span class="name">новый_трек.flac</span>
-                        <span class="file-size">32.8 MB</span>
-                        <button class="track-menu-btn">⋮</button>
-                    </div>
-                    <div class="media-item">
-                        <span class="icon">🎬</span>
-                        <span class="name">фильм_до_конца.mp4</span>
-                        <span class="file-size">120.5 MB</span>
-                        <button class="track-menu-btn">⋮</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    `;
+                    playlistsList.appendChild(newPlaylist);
+                    
+                    const countElem = document.getElementById('count-playlists');
+                    if (countElem) {
+                        const currentCount = parseInt(countElem.textContent) + 1;
+                        countElem.textContent = currentCount;
+                    }
+                }
+                
+                if (newPlaylistModal) {
+                    newPlaylistModal.classList.remove('active');
+                }
+            }
+        });
+    }
 
-        <!-- СТРАНИЦА 2 - МУЗЫКА -->
-        <div id="page-music" class="page">
-            <div class="page-header">
-                <div class="header-left"></div>
-                <div class="header-title">Музыка</div>
-                <div class="header-right">
-                    <button id="search-toggle" class="search-icon-btn">🔍</button>
-                    <button id="back-to-main" class="back-icon-btn">↩︎</button>
-                </div>
-            </div>
+    if (closePlaylistModal) {
+        closePlaylistModal.addEventListener('click', () => {
+            if (newPlaylistModal) {
+                newPlaylistModal.classList.remove('active');
+            }
+        });
+    }
 
-            <!-- ПОИСКОВАЯ СТРОКА -->
-            <div id="search-bar" class="search-bar hidden">
-                <input type="text" id="search-input" placeholder="Поиск по названию...">
-                <button id="search-clear" class="search-clear">✕</button>
-            </div>
+    // ========== МЕНЮ ТРЕКА ==========
+    document.querySelectorAll('.track-menu-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Не запускаем воспроизведение
+            
+            const mediaItem = btn.closest('.media-item, .folder-item, .playlist-item');
+            const trackName = mediaItem.querySelector('.name')?.textContent || 'Трек';
+            const trackIcon = mediaItem.querySelector('.icon')?.textContent || '🎵';
+            
+            selectedTrack = {
+                name: trackName,
+                icon: trackIcon,
+                element: mediaItem
+            };
+            
+            trackMenuTitle.textContent = trackName;
+            trackMenuModal.classList.add('active');
+        });
+    });
 
-            <!-- ВКЛАДКИ -->
-            <div class="tabs-container">
-                <div class="tabs-scroll" id="tabs-scroll">
-                    <div class="tab-item active-tab" data-tab="all">Все <span class="tab-count" id="count-all">128</span></div>
-                    <div class="tab-item" data-tab="folders">Папки <span class="tab-count" id="count-folders">12</span></div>
-                    <div class="tab-item" data-tab="playlists">Плейлисты <span class="tab-count" id="count-playlists">3</span></div>
-                    <div class="tab-item" data-tab="albums">Альбомы <span class="tab-count" id="count-albums">24</span></div>
-                    <div class="tab-item" data-tab="artists">Артист <span class="tab-count" id="count-artists">18</span></div>
-                    <div class="tab-item" data-tab="genres">Жанры <span class="tab-count" id="count-genres">9</span></div>
-                    <div class="tab-item edit-tab" id="edit-tabs-btn">✎</div>
-                </div>
-            </div>
+    // Закрытие меню трека
+    if (closeTrackMenu) {
+        closeTrackMenu.addEventListener('click', () => {
+            trackMenuModal.classList.remove('active');
+        });
+    }
 
-            <!-- КОНТЕНТ ВКЛАДОК -->
-            <div class="tab-content">
-                <!-- ВСЕ -->
-                <div class="tab-pane active-pane" id="tab-all">
-                    <div class="pane-header">
-                        <span class="pane-title">Все аудиофайлы</span>
-                        <div class="sort-dropdown">
-                            <button class="sort-btn">Сортировка: Название ▼</button>
-                            <div class="sort-menu">
-                                <div class="sort-item" data-sort="name">По названию</div>
-                                <div class="sort-item" data-sort="size">По размеру</div>
-                                <div class="sort-item" data-sort="date">По дате</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="media-window full-height" id="music-media-window">
-                        <div class="media-list" id="all-audio-list">
-                            <div class="media-item">
-                                <span class="icon">🎵</span>
-                                <span class="name">трек_1.mp3</span>
-                                <span class="file-size">5.2 MB</span>
-                                <button class="track-menu-btn">⋮</button>
-                            </div>
-                            <div class="media-item">
-                                <span class="icon">🎵</span>
-                                <span class="name">трек_2.flac</span>
-                                <span class="file-size">24.8 MB</span>
-                                <button class="track-menu-btn">⋮</button>
-                            </div>
-                            <div class="media-item">
-                                <span class="icon">🎵</span>
-                                <span class="name">трек_3.mp3</span>
-                                <span class="file-size">8.3 MB</span>
-                                <button class="track-menu-btn">⋮</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    // Обработка пунктов меню
+    document.querySelectorAll('.track-menu-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            const action = item.getAttribute('data-action');
+            
+            // Закрываем меню трека
+            trackMenuModal.classList.remove('active');
+            
+            switch(action) {
+                case 'add-to-playlist':
+                    if (addToPlaylistModal) addToPlaylistModal.classList.add('active');
+                    break;
+                case 'add-to-album':
+                    alert('Добавление в альбом будет доступно в следующей версии');
+                    break;
+                case 'share':
+                    if (shareModal) shareModal.classList.add('active');
+                    break;
+                case 'set-ringtone':
+                    if (selectedTrack) {
+                        alert(`"${selectedTrack.name}" установлен как рингтон`);
+                        // Здесь будет реальная установка рингтона через Capacitor
+                    }
+                    break;
+                case 'edit-tags':
+                    if (editTagsModal) {
+                        // Заполняем поля текущими значениями (заглушка)
+                        document.getElementById('edit-title').value = selectedTrack?.name || '';
+                        editTagsModal.classList.add('active');
+                    }
+                    break;
+                case 'cut-track':
+                    if (cutTrackModal) {
+                        document.getElementById('cut-track-name').textContent = selectedTrack?.name || '';
+                        // Сброс слайдеров
+                        if (startSlider) startSlider.value = 0;
+                        if (endSlider) endSlider.value = 100;
+                        if (startTime) startTime.textContent = '0:00';
+                        if (endTime) endTime.textContent = '3:45'; // Заглушка
+                        cutTrackModal.classList.add('active');
+                    }
+                    break;
+                case 'delete':
+                    if (selectedTrack && confirm(`Удалить "${selectedTrack.name}" с телефона?`)) {
+                        selectedTrack.element.remove();
+                        console.log('Трек удален');
+                    }
+                    break;
+            }
+        });
+    });
 
-                <!-- ПАПКИ -->
-                <div class="tab-pane" id="tab-folders">
-                    <div class="pane-header">
-                        <span class="pane-title">Папки с аудио</span>
-                        <div class="sort-dropdown">
-                            <button class="sort-btn">Сортировка: Название ▼</button>
-                            <div class="sort-menu">
-                                <div class="sort-item" data-sort="name">По названию</div>
-                                <div class="sort-item" data-sort="count">По количеству</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="media-window full-height">
-                        <div class="media-list">
-                            <div class="folder-item">
-                                <span class="icon">📁</span>
-                                <span class="name">Музыка</span>
-                                <span class="file-count">45 файлов</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    // ========== РЕДАКТИРОВАНИЕ ТЕГОВ ==========
+    if (closeTagsModal) {
+        closeTagsModal.addEventListener('click', () => {
+            editTagsModal.classList.remove('active');
+        });
+    }
 
-                <!-- ПЛЕЙЛИСТЫ -->
-                <div class="tab-pane" id="tab-playlists">
-                    <div class="pane-header">
-                        <span class="pane-title">Плейлисты</span>
-                        <button id="create-playlist-btn" class="create-btn">+ Новый плейлист</button>
-                    </div>
-                    <div class="media-window full-height">
-                        <div class="media-list" id="playlists-list">
-                            <div class="playlist-item">
-                                <span class="icon">📋</span>
-                                <span class="name">Любимое</span>
-                                <span class="file-count">15 треков</span>
-                                <button class="track-menu-btn">⋮</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    if (saveTagsBtn) {
+        saveTagsBtn.addEventListener('click', () => {
+            const title = document.getElementById('edit-title').value;
+            const artist = document.getElementById('edit-artist').value;
+            const album = document.getElementById('edit-album').value;
+            const genre = document.getElementById('edit-genre').value;
+            
+            console.log('Сохранены теги:', { title, artist, album, genre });
+            alert('Теги обновлены');
+            editTagsModal.classList.remove('active');
+        });
+    }
 
-                <!-- АЛЬБОМЫ -->
-                <div class="tab-pane" id="tab-albums">
-                    <div class="pane-header">
-                        <span class="pane-title">Альбомы</span>
-                        <div class="sort-dropdown">
-                            <button class="sort-btn">Сортировка: Название ▼</button>
-                            <div class="sort-menu">
-                                <div class="sort-item" data-sort="name">По названию</div>
-                                <div class="sort-item" data-sort="artist">По артисту</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="media-window full-height">
-                        <div class="media-list">
-                            <div class="media-item">
-                                <span class="icon">💿</span>
-                                <span class="name">Альбом 2024</span>
-                                <span class="artist-name">Исполнитель</span>
-                                <button class="track-menu-btn">⋮</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    // ========== ОБРЕЗКА ТРЕКА ==========
+    if (startSlider) {
+        startSlider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            const minutes = Math.floor(val / 20);
+            const seconds = Math.floor((val % 20) * 3);
+            startTime.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        });
+    }
 
-                <!-- АРТИСТ -->
-                <div class="tab-pane" id="tab-artists">
-                    <div class="pane-header">
-                        <span class="pane-title">Исполнители</span>
-                        <div class="sort-dropdown">
-                            <button class="sort-btn">Сортировка: Имя ▼</button>
-                            <div class="sort-menu">
-                                <div class="sort-item" data-sort="name">По имени</div>
-                                <div class="sort-item" data-sort="count">По количеству</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="media-window full-height">
-                        <div class="media-list">
-                            <div class="media-item">
-                                <span class="icon">👤</span>
-                                <span class="name">Исполнитель 1</span>
-                                <span class="file-count">12 треков</span>
-                                <button class="track-menu-btn">⋮</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    if (endSlider) {
+        endSlider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            const minutes = Math.floor(val / 20);
+            const seconds = Math.floor((val % 20) * 3);
+            endTime.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        });
+    }
 
-                <!-- ЖАНРЫ -->
-                <div class="tab-pane" id="tab-genres">
-                    <div class="pane-header">
-                        <span class="pane-title">Жанры</span>
-                        <div class="sort-dropdown">
-                            <button class="sort-btn">Сортировка: Название ▼</button>
-                            <div class="sort-menu">
-                                <div class="sort-item" data-sort="name">По названию</div>
-                                <div class="sort-item" data-sort="count">По количеству</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="media-window full-height">
-                        <div class="media-list">
-                            <div class="media-item">
-                                <span class="icon">🎸</span>
-                                <span class="name">Рок</span>
-                                <span class="file-count">34 трека</span>
-                                <button class="track-menu-btn">⋮</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    if (closeCutModal) {
+        closeCutModal.addEventListener('click', () => {
+            cutTrackModal.classList.remove('active');
+        });
+    }
 
-        <!-- МИНИ-ПЛЕЕР -->
-        <div id="mini-player" class="mini-player hidden">
-            <div class="mini-player-content">
-                <div class="mini-player-info">
-                    <span class="mini-player-icon" id="mini-icon">🎵</span>
-                    <span class="mini-player-track" id="mini-track-name">трек.mp3</span>
-                </div>
-                <div class="mini-player-controls">
-                    <button id="mini-play-pause" class="mini-btn">▶</button>
-                    <span class="mini-time" id="mini-time">0:00 / 0:00</span>
-                </div>
-            </div>
-        </div>
+    if (saveCutBtn) {
+        saveCutBtn.addEventListener('click', () => {
+            const start = startTime.textContent;
+            const end = endTime.textContent;
+            alert(`Отрезок сохранен (${start} - ${end})`);
+            cutTrackModal.classList.remove('active');
+        });
+    }
 
-        <!-- МЕНЮ ТРЕКА (ПОПАП) -->
-        <div id="track-menu-modal" class="modal">
-            <div class="modal-content track-menu-content">
-                <h3 id="track-menu-title">Действия с треком</h3>
-                <div class="track-menu-list">
-                    <div class="track-menu-item" data-action="add-to-playlist">
-                        <span class="menu-icon">➕</span>
-                        <span>Добавить в плейлист</span>
-                    </div>
-                    <div class="track-menu-item" data-action="add-to-album">
-                        <span class="menu-icon">💿</span>
-                        <span>Добавить в альбом</span>
-                    </div>
-                    <div class="track-menu-item" data-action="share">
-                        <span class="menu-icon">📤</span>
-                        <span>Поделиться</span>
-                    </div>
-                    <div class="track-menu-item" data-action="set-ringtone">
-                        <span class="menu-icon">🔔</span>
-                        <span>Установить как рингтон</span>
-                    </div>
-                    <div class="track-menu-item" data-action="edit-tags">
-                        <span class="menu-icon">✏️</span>
-                        <span>Редактировать теги</span>
-                    </div>
-                    <div class="track-menu-item" data-action="cut-track">
-                        <span class="menu-icon">✂️</span>
-                        <span>Обрезать трек</span>
-                    </div>
-                    <div class="track-menu-item" data-action="delete">
-                        <span class="menu-icon">🗑️</span>
-                        <span class="delete-text">Удалить с телефона</span>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button id="close-track-menu">Отмена</button>
-                </div>
-            </div>
-        </div>
+    // ========== ДОБАВЛЕНИЕ В ПЛЕЙЛИСТ ==========
+    document.querySelectorAll('.add-to-playlist-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const playlistItem = btn.closest('.playlist-select-item');
+            const playlistName = playlistItem.querySelector('span')?.textContent;
+            
+            if (selectedTrack) {
+                alert(`"${selectedTrack.name}" добавлен в плейлист "${playlistName}"`);
+                addToPlaylistModal.classList.remove('active');
+            }
+        });
+    });
 
-        <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ТЕГОВ -->
-        <div id="edit-tags-modal" class="modal">
-            <div class="modal-content">
-                <h3>Редактировать теги</h3>
-                <div class="edit-tags-form">
-                    <input type="text" id="edit-title" placeholder="Название">
-                    <input type="text" id="edit-artist" placeholder="Артист">
-                    <input type="text" id="edit-album" placeholder="Альбом">
-                    <input type="text" id="edit-genre" placeholder="Жанр">
-                </div>
-                <div class="modal-buttons">
-                    <button id="save-tags-btn">Сохранить</button>
-                    <button id="close-tags-modal">Отмена</button>
-                </div>
-            </div>
-        </div>
+    if (closePlaylistSelect) {
+        closePlaylistSelect.addEventListener('click', () => {
+            addToPlaylistModal.classList.remove('active');
+        });
+    }
 
-        <!-- МОДАЛКА ОБРЕЗКИ ТРЕКА -->
-        <div id="cut-track-modal" class="modal">
-            <div class="modal-content cut-modal-content">
-                <h3>Обрезать трек</h3>
-                <div class="cut-track-preview">
-                    <span class="cut-track-name" id="cut-track-name">трек.mp3</span>
-                </div>
-                <div class="cut-sliders">
-                    <div class="cut-slider-container">
-                        <span class="slider-label">Начало:</span>
-                        <span class="slider-value" id="start-time">0:00</span>
-                        <input type="range" id="start-slider" min="0" max="100" value="0" class="cut-slider">
-                    </div>
-                    <div class="cut-slider-container">
-                        <span class="slider-label">Конец:</span>
-                        <span class="slider-value" id="end-time">3:45</span>
-                        <input type="range" id="end-slider" min="0" max="100" value="100" class="cut-slider">
-                    </div>
-                </div>
-                <div class="cut-preview">
-                    <div class="cut-waveform">
-                        <div class="waveform-placeholder"></div>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button id="save-cut-btn">Сохранить отрезок</button>
-                    <button id="close-cut-modal">Отмена</button>
-                </div>
-            </div>
-        </div>
+    // ========== ПОДЕЛИТЬСЯ ==========
+    document.querySelectorAll('.share-option').forEach(option => {
+        option.addEventListener('click', () => {
+            const shareMethod = option.getAttribute('data-share');
+            const trackName = selectedTrack?.name || 'трек';
+            
+            if (shareMethod === 'system') {
+                // Здесь будет вызов системного меню шаринга
+                alert(`Системное меню шаринга для "${trackName}"`);
+            } else {
+                alert(`Поделиться "${trackName}" через ${shareMethod}`);
+            }
+            
+            shareModal.classList.remove('active');
+        });
+    });
 
-        <!-- МОДАЛКА ДОБАВЛЕНИЯ В ПЛЕЙЛИСТ -->
-        <div id="add-to-playlist-modal" class="modal">
-            <div class="modal-content">
-                <h3>Выберите плейлист</h3>
-                <div class="playlist-select-list" id="playlist-select-list">
-                    <div class="playlist-select-item">
-                        <span>Любимое</span>
-                        <button class="add-to-playlist-btn">+</button>
-                    </div>
-                    <div class="playlist-select-item">
-                        <span>В машину</span>
-                        <button class="add-to-playlist-btn">+</button>
-                    </div>
-                    <div class="playlist-select-item">
-                        <span>Для сна</span>
-                        <button class="add-to-playlist-btn">+</button>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button id="close-playlist-select">Отмена</button>
-                </div>
-            </div>
-        </div>
+    if (closeShareModal) {
+        closeShareModal.addEventListener('click', () => {
+            shareModal.classList.remove('active');
+        });
+    }
 
-        <!-- МОДАЛКА ПОДЕЛИТЬСЯ -->
-        <div id="share-modal" class="modal">
-            <div class="modal-content">
-                <h3>Поделиться треком</h3>
-                <div class="share-options">
-                    <div class="share-option" data-share="gmail">
-                        <span class="share-icon">📧</span>
-                        <span>Gmail</span>
-                    </div>
-                    <div class="share-option" data-share="telegram">
-                        <span class="share-icon">✈️</span>
-                        <span>Telegram</span>
-                    </div>
-                    <div class="share-option" data-share="whatsapp">
-                        <span class="share-icon">💬</span>
-                        <span>WhatsApp</span>
-                    </div>
-                    <div class="share-option" data-share="bluetooth">
-                        <span class="share-icon">📶</span>
-                        <span>Bluetooth</span>
-                    </div>
-                    <div class="share-option" data-share="system">
-                        <span class="share-icon">📱</span>
-                        <span>Системное меню</span>
-                    </div>
-                </div>
-                <div class="modal-buttons">
-                    <button id="close-share-modal">Отмена</button>
-                </div>
-            </div>
-        </div>
+    // ========== МОДАЛКА РЕДАКТИРОВАНИЯ ВКЛАДОК ==========
+    if (editTabsBtn) {
+        editTabsBtn.addEventListener('click', () => {
+            const tabs = Array.from(tabItems).map(tab => ({
+                name: tab.textContent.replace(/[0-9]/g, '').trim(),
+                dataTab: tab.getAttribute('data-tab')
+            }));
+            
+            renderEditTabsList(tabs);
+            if (editTabsModal) {
+                editTabsModal.classList.add('active');
+            }
+        });
+    }
 
-        <!-- МОДАЛКА РЕДАКТИРОВАНИЯ ВКЛАДОК -->
-        <div id="edit-tabs-modal" class="modal">
-            <div class="modal-content">
-                <h3 class="modal-title">Редактировать вкладки</h3>
-                <div class="edit-tabs-list" id="edit-tabs-list"></div>
-                <div class="modal-buttons">
-                    <button id="save-tabs-btn">Готово</button>
-                    <button id="close-edit-modal-btn">Отмена</button>
-                </div>
-            </div>
-        </div>
+    if (closeEditModalBtn) {
+        closeEditModalBtn.addEventListener('click', () => {
+            if (editTabsModal) {
+                editTabsModal.classList.remove('active');
+            }
+        });
+    }
 
-        <!-- Модалка нового плейлиста -->
-        <div id="new-playlist-modal" class="modal">
-            <div class="modal-content">
-                <h3>Новый плейлист</h3>
-                <input type="text" id="playlist-name" placeholder="Название плейлиста">
-                <div class="modal-buttons">
-                    <button id="create-playlist-confirm">Создать</button>
-                    <button id="close-playlist-modal">Отмена</button>
-                </div>
-            </div>
-        </div>
+    if (saveTabsBtn) {
+        saveTabsBtn.addEventListener('click', () => {
+            const editItems = document.querySelectorAll('.edit-tab-item');
+            const newOrder = Array.from(editItems).map(item => ({
+                name: item.querySelector('.tab-name')?.textContent || '',
+                dataTab: item.getAttribute('data-tab')
+            }));
+            
+            updateTabsOrder(newOrder);
+            
+            if (editTabsModal) {
+                editTabsModal.classList.remove('active');
+            }
+        });
+    }
 
-        <!-- Модалка ссылки -->
-        <div id="link-modal" class="modal">
-            <div class="modal-content">
-                <h3>Вставьте ссылку</h3>
-                <input type="url" id="url-input" placeholder="https://...">
-                <div class="modal-buttons">
-                    <button id="play-url-btn">Играть</button>
-                    <button id="close-modal-btn">Отмена</button>
-                </div>
-            </div>
-        </div>
+    function renderEditTabsList(tabs) {
+        if (!editTabsList) return;
+        
+        editTabsList.innerHTML = '';
+        
+        tabs.forEach(tab => {
+            const item = document.createElement('div');
+            item.className = 'edit-tab-item';
+            item.setAttribute('data-tab', tab.dataTab);
+            item.innerHTML = `
+                <span class="drag-handle">⋮⋮</span>
+                <span class="tab-name">${tab.name}</span>
+            `;
+            
+            item.setAttribute('draggable', 'true');
+            
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('drop', handleDrop);
+            item.addEventListener('dragend', handleDragEnd);
+            
+            editTabsList.appendChild(item);
+        });
+    }
 
-        <!-- ПОЛНОЭКРАННЫЙ ПЛЕЕР -->
-        <div id="player-screen" style="display: none;">
-            <video id="video-player" controls style="width:100%; height:100%;"></video>
-            <audio id="audio-player" controls style="display: none;"></audio>
-            <div class="subtitle-btn" id="subtitle-btn" style="display: none;">
-                <button id="load-subtitle">📄 Субтитры</button>
-                <input type="file" id="subtitle-file" accept=".srt" style="display: none;">
-            </div>
-        </div>
-    </div>
+    let dragStartIndex;
 
-    <script src="script.js"></script>
-</body>
-</html>
+    function handleDragStart(e) {
+        dragStartIndex = Array.from(editTabsList.children).indexOf(this);
+        this.style.opacity = '0.5';
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const dragEndIndex = Array.from(editTabsList.children).indexOf(this);
+        
+        if (dragStartIndex !== dragEndIndex) {
+            const items = Array.from(editTabsList.children);
+            const dragItem = items[dragStartIndex];
+            const dropItem = items[dragEndIndex];
+            
+            if (dragStartIndex < dragEndIndex) {
+                dropItem.after(dragItem);
+            } else {
+                dropItem.before(dragItem);
+            }
+        }
+        
+        this.style.opacity = '';
+    }
+
+    function handleDragEnd(e) {
+        this.style.opacity = '';
+    }
+
+    function updateTabsOrder(newOrder) {
+        if (!tabsScroll) return;
+        
+        tabsScroll.innerHTML = '';
+        
+        newOrder.forEach(tab => {
+            const tabElement = document.createElement('div');
+            tabElement.className = 'tab-item';
+            if (tab.dataTab === 'all') {
+                tabElement.classList.add('active-tab');
+            }
+            tabElement.setAttribute('data-tab', tab.dataTab);
+            tabElement.textContent = tab.name;
+            
+            tabElement.addEventListener('click', () => {
+                document.querySelectorAll('.tab-item:not(.edit-tab)').forEach(t => t.classList.remove('active-tab'));
+                tabElement.classList.add('active-tab');
+                
+                const tabName = tabElement.getAttribute('data-tab');
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active-pane'));
+                const activePane = document.getElementById(`tab-${tabName}`);
+                if (activePane) {
+                    activePane.classList.add('active-pane');
+                }
+            });
+            
+            tabsScroll.appendChild(tabElement);
+        });
+        
+        const editBtn = document.createElement('div');
+        editBtn.className = 'tab-item edit-tab';
+        editBtn.id = 'edit-tabs-btn';
+        editBtn.textContent = '✎';
+        editBtn.addEventListener('click', () => {
+            const tabs = Array.from(document.querySelectorAll('.tab-item:not(.edit-tab)')).map(t => ({
+                name: t.textContent,
+                dataTab: t.getAttribute('data-tab')
+            }));
+            renderEditTabsList(tabs);
+            if (editTabsModal) {
+                editTabsModal.classList.add('active');
+            }
+        });
+        tabsScroll.appendChild(editBtn);
+    }
+
+    // ========== ФУНКЦИИ ПЛЕЕРА ==========
+    function formatTime(seconds) {
+        if (isNaN(seconds) || !isFinite(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function updateMiniPlayerTime() {
+        if (currentAudio) {
+            const current = formatTime(currentAudio.currentTime);
+            const duration = formatTime(currentAudio.duration);
+            miniTime.textContent = `${current} / ${duration}`;
+        }
+    }
+
+    function playMedia(file) {
+        console.log('Воспроизведение:', file.name);
+        
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+        
+        currentAudio = new Audio(file.path || file.name);
+        currentTrack = file;
+        
+        miniIcon.textContent = file.icon || '🎵';
+        miniTrackName.textContent = file.name;
+        miniPlayer.classList.remove('hidden');
+        
+        currentAudio.addEventListener('timeupdate', updateMiniPlayerTime);
+        currentAudio.addEventListener('loadedmetadata', updateMiniPlayerTime);
+        currentAudio.addEventListener('ended', () => {
+            isPlaying = false;
+            miniPlayPause.textContent = '▶';
+        });
+        
+        currentAudio.play()
+            .then(() => {
+                isPlaying = true;
+                miniPlayPause.textContent = '⏸';
+            })
+            .catch(e => {
+                console.error('Ошибка воспроизведения:', e);
+            });
+    }
+
+    // Обработчики кликов на медиа-элементы (но не на кнопку меню)
+    document.querySelectorAll('.media-item, .folder-item, .playlist-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            // Если кликнули на кнопку меню - не запускаем воспроизведение
+            if (e.target.closest('.track-menu-btn')) return;
+            
+            const icon = item.querySelector('.icon')?.textContent || '🎵';
+            const name = item.querySelector('.name')?.textContent || '';
+            
+            let type = 'audio';
+            if (icon.includes('🎬')) type = 'video';
+            
+            playMedia({ name, icon, type, path: name });
+        });
+    });
+
+    // Управление мини-плеером
+    if (miniPlayPause) {
+        miniPlayPause.addEventListener('click', (e) => {
+            e.stopPropagation();
+            
+            if (currentAudio) {
+                if (isPlaying) {
+                    currentAudio.pause();
+                    miniPlayPause.textContent = '▶';
+                } else {
+                    currentAudio.play();
+                    miniPlayPause.textContent = '⏸';
+                }
+                isPlaying = !isPlaying;
+            }
+        });
+    }
+
+    if (miniPlayer) {
+        miniPlayer.addEventListener('click', () => {
+            if (currentTrack && currentAudio) {
+                app.style.display = 'none';
+                playerScreen.style.display = 'block';
+                
+                const currentTime = currentAudio.currentTime;
+                
+                if (currentTrack.type === 'video') {
+                    videoPlayer.style.display = 'block';
+                    audioPlayer.style.display = 'none';
+                    videoPlayer.src = currentTrack.path || currentTrack.name;
+                    videoPlayer.currentTime = currentTime;
+                    videoPlayer.play();
+                    subtitleBtn.style.display = 'block';
+                } else {
+                    audioPlayer.style.display = 'block';
+                    videoPlayer.style.display = 'none';
+                    audioPlayer.src = currentTrack.path || currentTrack.name;
+                    audioPlayer.currentTime = currentTime;
+                    audioPlayer.play();
+                    subtitleBtn.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    // Выход из полноэкранного плеера
+    function exitPlayer() {
+        if (playerScreen && playerScreen.style.display === 'block') {
+            playerScreen.style.display = 'none';
+            app.style.display = 'flex';
+            
+            if (videoPlayer) videoPlayer.pause();
+            if (audioPlayer) audioPlayer.pause();
+        }
+    }
+
+    document.addEventListener('backbutton', exitPlayer, false);
+
+    // Тап по видео/аудио для паузы/плей
+    if (videoPlayer) {
+        videoPlayer.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (videoPlayer.paused) {
+                videoPlayer.play().catch(e => console.log('Ошибка воспроизведения'));
+            } else {
+                videoPlayer.pause();
+            }
+        });
+    }
+
+    if (audioPlayer) {
+        audioPlayer.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (audioPlayer.paused) {
+                audioPlayer.play().catch(e => console.log('Ошибка воспроизведения'));
+            } else {
+                audioPlayer.pause();
+            }
+        });
+    }
+
+    // ========== МОДАЛКА ССЫЛКИ ==========
+    if (addLinkBtn) {
+        addLinkBtn.addEventListener('click', () => {
+            if (modal) {
+                modal.classList.add('active');
+                if (urlInput) {
+                    urlInput.value = '';
+                    urlInput.focus();
+                }
+            }
+        });
+    }
+
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', () => {
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        });
+    }
+
+    if (playUrlBtn) {
+        playUrlBtn.addEventListener('click', () => {
+            const url = urlInput ? urlInput.value.trim() : '';
+            if (url) {
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+                playMedia({ name: url, icon: '🔗', type: 'audio', path: url });
+            }
+        });
+    }
+
+    // ========== СУБТИТРЫ ==========
+    if (loadSubtitle) {
+        loadSubtitle.addEventListener('click', () => {
+            if (subtitleFile) {
+                subtitleFile.click();
+            }
+        });
+    }
+
+    if (subtitleFile) {
+        subtitleFile.addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                console.log('Субтитры:', e.target.files[0].name);
+            }
+        });
+    }
+
+    console.log('Скрипт загружен полностью');
+});
