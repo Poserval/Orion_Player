@@ -105,12 +105,17 @@ document.addEventListener('DOMContentLoaded', () => {
         TIMESTAMP: 'orion_timestamp'
     };
 
-    // ========== MEDIA SESSION API ==========
-    function updateMediaSession(file, isPaused = false) {
-        if ('mediaSession' in navigator) {
-            console.log('Обновляем MediaSession для:', file.displayName);
+    // ========== CAPACITOR MEDIA ДЛЯ СИСТЕМНОГО МЕНЮ ==========
+    async function setupMediaSession(file, audioElement) {
+        if (typeof Capacitor === 'undefined') return;
+        
+        try {
+            const { Media } = Capacitor.Plugins;
             
-            navigator.mediaSession.metadata = new MediaMetadata({
+            if (!Media) return;
+
+            // Регистрируем медиа-сессию
+            await Media.setMetadata({
                 title: file.displayName || file.title || 'Без названия',
                 artist: file.artist || 'Неизвестный исполнитель',
                 album: file.album || '',
@@ -120,28 +125,46 @@ document.addEventListener('DOMContentLoaded', () => {
                     { src: 'assets/images/icon-header.png', sizes: '192x192', type: 'image/png' },
                     { src: 'assets/images/icon-header.png', sizes: '256x256', type: 'image/png' },
                     { src: 'assets/images/icon-header.png', sizes: '512x512', type: 'image/png' }
-                ]
+                ],
+                duration: file.duration ? file.duration / 1000 : 0
             });
 
-            navigator.mediaSession.setActionHandler('play', () => {
-                if (currentAudio) {
-                    currentAudio.play();
+            // Обработчики системных кнопок
+            Media.addListener('play', () => {
+                if (audioElement) {
+                    audioElement.play();
                     isPlaying = true;
                     miniPlayPause.textContent = '⏸';
-                    updateMediaSession(file, false);
                 }
             });
 
-            navigator.mediaSession.setActionHandler('pause', () => {
-                if (currentAudio) {
-                    currentAudio.pause();
+            Media.addListener('pause', () => {
+                if (audioElement) {
+                    audioElement.pause();
                     isPlaying = false;
                     miniPlayPause.textContent = '▶';
-                    updateMediaSession(file, true);
                 }
             });
 
-            navigator.mediaSession.playbackState = isPaused ? 'paused' : 'playing';
+            Media.addListener('seekTo', (info) => {
+                if (audioElement && info.time !== undefined) {
+                    audioElement.currentTime = info.time;
+                }
+            });
+
+            Media.addListener('next', () => {
+                console.log('Следующий трек - в разработке');
+            });
+
+            Media.addListener('previous', () => {
+                console.log('Предыдущий трек - в разработке');
+            });
+
+            // Обновляем состояние воспроизведения
+            Media.setPlaybackState({ state: isPlaying ? 'playing' : 'paused' });
+
+        } catch (error) {
+            console.error('Ошибка настройки Media:', error);
         }
     }
 
@@ -742,23 +765,37 @@ document.addEventListener('DOMContentLoaded', () => {
             miniTrackName.textContent = file.displayName || file.title || 'Трек';
             miniPlayer.classList.remove('hidden');
 
+            // Настраиваем MediaSession через Capacitor
+            await setupMediaSession(file, currentAudio);
+
             currentAudio.addEventListener('timeupdate', () => {
                 const current = formatTime(currentAudio.currentTime);
                 const duration = formatTime(currentAudio.duration);
                 miniTime.textContent = `${current} / ${duration}`;
+                
+                // Обновляем позицию в системном меню
+                if (typeof Capacitor !== 'undefined' && Capacitor.Plugins.Media) {
+                    Capacitor.Plugins.Media.setPlaybackPosition({
+                        position: currentAudio.currentTime
+                    });
+                }
             });
             
             currentAudio.addEventListener('ended', () => {
                 isPlaying = false;
                 miniPlayPause.textContent = '▶';
-                updateMediaSession(file, true);
+                if (typeof Capacitor !== 'undefined' && Capacitor.Plugins.Media) {
+                    Capacitor.Plugins.Media.setPlaybackState({ state: 'paused' });
+                }
             });
 
             currentAudio.play()
                 .then(() => {
                     isPlaying = true;
                     miniPlayPause.textContent = '⏸';
-                    updateMediaSession(file, false);
+                    if (typeof Capacitor !== 'undefined' && Capacitor.Plugins.Media) {
+                        Capacitor.Plugins.Media.setPlaybackState({ state: 'playing' });
+                    }
                 })
                 .catch(e => {
                     alert('Не удалось воспроизвести файл. Формат не поддерживается.');
@@ -776,12 +813,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isPlaying) {
                     currentAudio.pause();
                     miniPlayPause.textContent = '▶';
-                    updateMediaSession(currentTrack, true);
+                    if (typeof Capacitor !== 'undefined' && Capacitor.Plugins.Media) {
+                        Capacitor.Plugins.Media.setPlaybackState({ state: 'paused' });
+                    }
                 } else {
                     currentAudio.play()
                         .then(() => {
                             miniPlayPause.textContent = '⏸';
-                            updateMediaSession(currentTrack, false);
+                            if (typeof Capacitor !== 'undefined' && Capacitor.Plugins.Media) {
+                                Capacitor.Plugins.Media.setPlaybackState({ state: 'playing' });
+                            }
                         })
                         .catch(e => {});
                 }
