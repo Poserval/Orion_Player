@@ -733,7 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ========== ИСПРАВЛЕННАЯ ФУНКЦИЯ ВОСПРОИЗВЕДЕНИЯ ==========
+    // ========== ФУНКЦИЯ ВОСПРОИЗВЕДЕНИЯ ==========
     async function playMedia(file) {
         console.log('Попытка воспроизведения:', file);
 
@@ -753,22 +753,10 @@ document.addEventListener('DOMContentLoaded', () => {
             let playableUrl;
             
             if (typeof Capacitor !== 'undefined') {
-                // Используем Capacitor для конвертации URI
                 if (file.uri.startsWith('content://')) {
                     playableUrl = Capacitor.convertFileSrc(file.uri);
                 } else {
-                    // Пробуем через Filesystem плагин
-                    try {
-                        const { Filesystem, Directory } = Capacitor.Plugins;
-                        const result = await Filesystem.getUri({
-                            path: file.uri,
-                            directory: Directory.External
-                        });
-                        playableUrl = Capacitor.convertFileSrc(result.uri);
-                    } catch (fsError) {
-                        console.error('Ошибка Filesystem:', fsError);
-                        playableUrl = file.uri;
-                    }
+                    playableUrl = Capacitor.convertFileSrc(file.uri);
                 }
             } else {
                 playableUrl = file.uri;
@@ -776,7 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             console.log('Playable URL:', playableUrl);
             
-            // Создаем новый Audio объект с правильным URL
+            // Создаем новый Audio объект
             currentAudio = new Audio(playableUrl);
             currentTrack = file;
 
@@ -802,26 +790,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Ошибка воспроизведения:', e);
                 console.error('Код ошибки:', currentAudio.error ? currentAudio.error.code : 'unknown');
                 
-                let errorMessage = 'Не удалось воспроизвести файл. ';
-                if (currentAudio.error) {
-                    switch(currentAudio.error.code) {
-                        case MediaError.MEDIA_ERR_ABORTED:
-                            errorMessage += 'Воспроизведение прервано.';
-                            break;
-                        case MediaError.MEDIA_ERR_NETWORK:
-                            errorMessage += 'Сетевая ошибка.';
-                            break;
-                        case MediaError.MEDIA_ERR_DECODE:
-                            errorMessage += 'Формат не поддерживается или файл поврежден.';
-                            break;
-                        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                            errorMessage += 'Формат не поддерживается браузером.';
-                            break;
-                        default:
-                            errorMessage += 'Неизвестная ошибка.';
+                if (currentAudio.error && currentAudio.error.code === 4) {
+                    // Пробуем альтернативный способ через полноэкранный плеер
+                    openFullscreenPlayer(file, 0);
+                } else {
+                    let errorMessage = 'Не удалось воспроизвести файл. ';
+                    if (currentAudio.error) {
+                        switch(currentAudio.error.code) {
+                            case MediaError.MEDIA_ERR_ABORTED:
+                                errorMessage += 'Воспроизведение прервано.';
+                                break;
+                            case MediaError.MEDIA_ERR_NETWORK:
+                                errorMessage += 'Сетевая ошибка.';
+                                break;
+                            case MediaError.MEDIA_ERR_DECODE:
+                                errorMessage += 'Формат не поддерживается или файл поврежден.';
+                                break;
+                            case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                                errorMessage += 'Формат не поддерживается браузером.';
+                                break;
+                            default:
+                                errorMessage += 'Неизвестная ошибка.';
+                        }
                     }
+                    alert(errorMessage);
                 }
-                alert(errorMessage);
             });
 
             // Запускаем
@@ -834,20 +827,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(e => {
                     console.error('Ошибка при попытке воспроизвести:', e);
                     
-                    let errorMessage = 'Не удалось воспроизвести файл. ';
-                    if (e.name === 'NotAllowedError') {
-                        errorMessage += 'Пользователь не взаимодействовал с документом.';
-                    } else if (e.name === 'NotSupportedError') {
-                        errorMessage += 'Формат не поддерживается.';
+                    if (e.name === 'NotSupportedError') {
+                        // Если не поддерживается, открываем полноэкранный плеер
+                        openFullscreenPlayer(file, 0);
                     } else {
-                        errorMessage += e.message;
+                        alert('Не удалось воспроизвести файл: ' + e.message);
                     }
-                    alert(errorMessage);
                 });
 
         } catch (e) {
             console.error('Критическая ошибка в playMedia:', e);
             alert('Ошибка при подготовке воспроизведения: ' + e.message);
+        }
+    }
+
+    // ========== ФУНКЦИЯ ОТКРЫТИЯ ПОЛНОЭКРАННОГО ПЛЕЕРА ==========
+    function openFullscreenPlayer(file, startTime = 0) {
+        console.log('Открываем полноэкранный плеер для:', file.displayName);
+        
+        playerScreen.style.display = 'block';
+        app.style.display = 'none';
+        
+        let playableUrl;
+        if (typeof Capacitor !== 'undefined') {
+            playableUrl = Capacitor.convertFileSrc(file.uri);
+        } else {
+            playableUrl = file.uri;
+        }
+        
+        if (file.mediaType === 'video') {
+            videoPlayer.style.display = 'block';
+            audioPlayer.style.display = 'none';
+            videoPlayer.src = playableUrl;
+            videoPlayer.currentTime = startTime;
+            videoPlayer.play().catch(e => console.error('Ошибка видео:', e));
+            if (subtitleBtn) subtitleBtn.style.display = 'block';
+        } else {
+            audioPlayer.style.display = 'block';
+            videoPlayer.style.display = 'none';
+            audioPlayer.src = playableUrl;
+            audioPlayer.currentTime = startTime;
+            audioPlayer.play().catch(e => console.error('Ошибка аудио:', e));
+            if (subtitleBtn) subtitleBtn.style.display = 'none';
         }
     }
 
@@ -884,41 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
         miniPlayer.addEventListener('click', () => {
             if (currentTrack && currentAudio) {
                 const currentTime = currentAudio.currentTime;
-                
-                playerScreen.style.display = 'block';
-                app.style.display = 'none';
-                
-                if (currentTrack.mediaType === 'video') {
-                    videoPlayer.style.display = 'block';
-                    audioPlayer.style.display = 'none';
-                    
-                    let videoUrl;
-                    if (typeof Capacitor !== 'undefined' && currentTrack.uri) {
-                        videoUrl = Capacitor.convertFileSrc(currentTrack.uri);
-                    } else {
-                        videoUrl = currentTrack.uri || currentTrack.path;
-                    }
-                    
-                    videoPlayer.src = videoUrl;
-                    videoPlayer.currentTime = currentTime;
-                    videoPlayer.play().catch(e => console.error('Ошибка видео:', e));
-                    if (subtitleBtn) subtitleBtn.style.display = 'block';
-                } else {
-                    audioPlayer.style.display = 'block';
-                    videoPlayer.style.display = 'none';
-                    
-                    let audioUrl;
-                    if (typeof Capacitor !== 'undefined' && currentTrack.uri) {
-                        audioUrl = Capacitor.convertFileSrc(currentTrack.uri);
-                    } else {
-                        audioUrl = currentTrack.uri || currentTrack.path;
-                    }
-                    
-                    audioPlayer.src = audioUrl;
-                    audioPlayer.currentTime = currentTime;
-                    audioPlayer.play().catch(e => console.error('Ошибка аудио:', e));
-                    if (subtitleBtn) subtitleBtn.style.display = 'none';
-                }
+                openFullscreenPlayer(currentTrack, currentTime);
             }
         });
     }
