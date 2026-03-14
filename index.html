@@ -213,7 +213,7 @@
             </div>
         </div>
 
-        <!-- ПОЛНОЭКРАННЫЙ ПЛЕЕР (ПЕРЕМЕЩЕН В КОНЕЦ, ЧТОБЫ БЫТЬ ПОВЕРХ ВСЕГО) -->
+        <!-- ПОЛНОЭКРАННЫЙ ПЛЕЕР (С НАТИВНЫМИ ПЛЕЕРАМИ ВНУТРИ) -->
         <div id="player-screen" style="display: none;">
             <div class="fullscreen-player">
                 <!-- Фоновый градиент -->
@@ -265,9 +265,11 @@
                 </div>
             </div>
             
-            <!-- Скрытые нативные плееры -->
-            <video id="video-player" style="display: none;"></video>
-            <audio id="audio-player" style="display: none;"></audio>
+            <!-- НАТИВНЫЕ ПЛЕЕРЫ (ПРОЗРАЧНЫЕ) -->
+            <div class="native-players-container">
+                <video id="video-player" preload="auto"></video>
+                <audio id="audio-player" preload="auto"></audio>
+            </div>
             
             <!-- Кнопка субтитров -->
             <div class="subtitle-btn" id="subtitle-btn" style="display: none;">
