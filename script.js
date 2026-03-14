@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const pageMain = document.getElementById('page-main');
     const pageMusic = document.getElementById('page-music');
     const musicBtn = document.getElementById('music-btn');
+    const videoBtn = document.getElementById('video-btn'); // если есть
+    const imagesBtn = document.getElementById('images-btn'); // если есть
+    const audiobooksBtn = document.getElementById('audiobooks-btn'); // если есть
     const backToMain = document.getElementById('back-to-main');
 
     // Элементы вкладок
@@ -73,6 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const shareModal = document.getElementById('share-modal');
     const closeShareModal = document.getElementById('close-share-modal');
+    
+    const newPlaylistModal = document.getElementById('new-playlist-modal');
+    const playlistName = document.getElementById('playlist-name');
+    const createPlaylistConfirm = document.getElementById('create-playlist-confirm');
+    const closePlaylistModal = document.getElementById('close-playlist-modal');
+    
+    const createPlaylistBtn = document.getElementById('create-playlist-btn');
 
     // Элементы сортировки
     const sortItems = document.querySelectorAll('.sort-item');
@@ -103,6 +113,62 @@ document.addEventListener('DOMContentLoaded', () => {
         TIMESTAMP: 'orion_timestamp'
     };
 
+    // ========== ИСТОРИЯ НАВИГАЦИИ ==========
+    let navigationStack = ['main']; // текущий стек навигации
+
+    function navigateTo(page) {
+        console.log('Навигация на:', page);
+        
+        // Скрываем все страницы
+        pageMain.classList.remove('active-page');
+        pageMusic.classList.remove('active-page');
+        // если есть другие страницы - добавить
+        
+        // Показываем нужную
+        if (page === 'main') {
+            pageMain.classList.add('active-page');
+        } else if (page === 'music') {
+            pageMusic.classList.add('active-page');
+        }
+        // else if (page === 'video') и т.д.
+        
+        // Добавляем в стек, если это не текущая страница
+        if (navigationStack[navigationStack.length - 1] !== page) {
+            navigationStack.push(page);
+        }
+        
+        console.log('Стек навигации:', navigationStack);
+    }
+
+    function goBack() {
+        console.log('Назад, текущий стек:', navigationStack);
+        
+        // Если в стеке больше одного элемента
+        if (navigationStack.length > 1) {
+            // Убираем текущий
+            navigationStack.pop();
+            // Переходим на предыдущий
+            const previousPage = navigationStack[navigationStack.length - 1];
+            
+            // Скрываем все страницы
+            pageMain.classList.remove('active-page');
+            pageMusic.classList.remove('active-page');
+            
+            // Показываем предыдущую
+            if (previousPage === 'main') {
+                pageMain.classList.add('active-page');
+            } else if (previousPage === 'music') {
+                pageMusic.classList.add('active-page');
+            }
+            
+            console.log('Возврат на:', previousPage);
+        } else {
+            console.log('Выход из приложения');
+            // Здесь можно либо выйти, либо ничего не делать
+            // navigator.app.exitApp();
+        }
+    }
+
     // ========== ЗАСТАВКА ==========
     if (splash) {
         setTimeout(() => {
@@ -111,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 splash.style.display = 'none';
                 initApp();
             }, 500);
-        }, 3000); // 3 секунды для теста
+        }, 3000);
     }
 
     // ========== ИНИЦИАЛИЗАЦИЯ ==========
@@ -133,6 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Загружаем плейлисты (они всегда из кэша)
         loadPlaylists();
+        
+        // Начальная страница - главная
+        navigationStack = ['main'];
     }
 
     // ========== ЗАГРУЗКА ИЗ КЭША ==========
@@ -788,62 +857,179 @@ document.addEventListener('DOMContentLoaded', () => {
     if (miniPlayer) {
         miniPlayer.addEventListener('click', () => {
             if (currentTrack && currentAudio) {
-                app.style.display = 'none';
-                playerScreen.style.display = 'block';
-
+                // Сохраняем текущую позицию
                 const currentTime = currentAudio.currentTime;
-
+                
+                // Показываем полноэкранный плеер
+                playerScreen.style.display = 'block';
+                app.style.display = 'none';
+                
                 if (currentTrack.mediaType === 'video') {
                     videoPlayer.style.display = 'block';
                     audioPlayer.style.display = 'none';
-                    videoPlayer.src = currentTrack.uri;
+                    videoPlayer.src = currentTrack.uri || currentTrack.path;
                     videoPlayer.currentTime = currentTime;
-                    videoPlayer.play();
-                    subtitleBtn.style.display = 'block';
+                    videoPlayer.play().catch(e => console.error('Ошибка видео:', e));
+                    if (subtitleBtn) subtitleBtn.style.display = 'block';
                 } else {
                     audioPlayer.style.display = 'block';
                     videoPlayer.style.display = 'none';
-                    audioPlayer.src = currentTrack.uri;
+                    audioPlayer.src = currentTrack.uri || currentTrack.path;
                     audioPlayer.currentTime = currentTime;
-                    audioPlayer.play();
-                    subtitleBtn.style.display = 'none';
+                    audioPlayer.play().catch(e => console.error('Ошибка аудио:', e));
+                    if (subtitleBtn) subtitleBtn.style.display = 'none';
                 }
             }
         });
     }
 
-    // Выход из полноэкранного плеера
+    // ========== ФУНКЦИЯ ВЫХОДА ИЗ ПЛЕЕРА ==========
     function exitPlayer() {
         if (playerScreen && playerScreen.style.display === 'block') {
+            console.log('Закрываем полноэкранный плеер');
+            
+            // Скрываем плеер
             playerScreen.style.display = 'none';
+            
+            // Показываем основное приложение
             app.style.display = 'flex';
-
-            if (videoPlayer) videoPlayer.pause();
-            if (audioPlayer) audioPlayer.pause();
+            
+            // Останавливаем воспроизведение
+            if (videoPlayer) {
+                videoPlayer.pause();
+                videoPlayer.src = '';
+            }
+            if (audioPlayer) {
+                audioPlayer.pause();
+                audioPlayer.src = '';
+            }
+            
+            console.log('Плеер закрыт');
         }
     }
 
-    document.addEventListener('backbutton', exitPlayer, false);
+    // ========== ОБРАБОТКА КНОПКИ НАЗАД ==========
+    function handleBackButton() {
+        console.log('Системная кнопка назад нажата');
+        
+        // Проверяем, открыт ли полноэкранный плеер
+        if (playerScreen && playerScreen.style.display === 'block') {
+            console.log('Закрываем полноэкранный плеер');
+            exitPlayer();
+            return;
+        }
+        
+        // Проверяем, открыта ли какая-то модалка
+        const activeModal = document.querySelector('.modal.active');
+        if (activeModal) {
+            console.log('Закрываем модалку');
+            activeModal.classList.remove('active');
+            return;
+        }
+        
+        // Используем стек навигации
+        goBack();
+    }
 
-    if (videoPlayer) {
-        videoPlayer.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (videoPlayer.paused) {
-                videoPlayer.play();
-            } else {
-                videoPlayer.pause();
+    // Регистрируем обработчик для системной кнопки назад
+    document.addEventListener('backbutton', handleBackButton, false);
+
+    // Также обрабатываем клавишу Escape для десктопного тестирования
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            handleBackButton();
+        }
+    });
+
+    // ========== НАВИГАЦИЯ ==========
+    if (musicBtn) {
+        musicBtn.addEventListener('click', () => {
+            navigateTo('music');
+        });
+    }
+
+    if (backToMain) {
+        backToMain.addEventListener('click', () => {
+            navigateTo('main');
+        });
+    }
+
+    // Добавь аналогично для других кнопок (видео, изображения, аудиокниги)
+    // if (videoBtn) {
+    //     videoBtn.addEventListener('click', () => {
+    //         navigateTo('video');
+    //     });
+    // }
+
+    // ========== ПОИСК ==========
+    if (searchToggle) {
+        searchToggle.addEventListener('click', () => {
+            searchBar.classList.toggle('hidden');
+            if (!searchBar.classList.contains('hidden')) {
+                searchInput.focus();
             }
         });
     }
 
-    if (audioPlayer) {
-        audioPlayer.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-            } else {
-                audioPlayer.pause();
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+
+            const activeTab = document.querySelector('.tab-pane.active-pane');
+            if (!activeTab) return;
+
+            const mediaItems = activeTab.querySelectorAll('.media-item, .folder-item, .playlist-item');
+
+            mediaItems.forEach(item => {
+                const name = item.querySelector('.name')?.textContent.toLowerCase() || '';
+                if (query === '' || name.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    if (searchClear) {
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+
+            const activeTab = document.querySelector('.tab-pane.active-pane');
+            if (activeTab) {
+                const mediaItems = activeTab.querySelectorAll('.media-item, .folder-item, .playlist-item');
+                mediaItems.forEach(item => {
+                    item.style.display = 'flex';
+                });
             }
+
+            searchInput.focus();
+        });
+    }
+
+    // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
+    if (tabItems.length > 0) {
+        tabItems.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabItems.forEach(t => t.classList.remove('active-tab'));
+                tab.classList.add('active-tab');
+
+                const tabName = tab.getAttribute('data-tab');
+
+                document.querySelectorAll('.tab-pane').forEach(pane => {
+                    pane.classList.remove('active-pane');
+                });
+
+                const activePane = document.getElementById(`tab-${tabName}`);
+                if (activePane) {
+                    activePane.classList.add('active-pane');
+                }
+
+                if (searchBar) {
+                    searchBar.classList.add('hidden');
+                    if (searchInput) searchInput.value = '';
+                }
+            });
         });
     }
 
@@ -921,7 +1107,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'set-ringtone':
                     if (selectedTrack?.data) {
                         try {
-                            // Здесь будет вызов системного API для установки рингтона
                             alert('Функция установки рингтона будет доступна в следующей версии');
                         } catch (e) {
                             console.error('Ошибка:', e);
@@ -948,7 +1133,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                 case 'delete':
                     if (selectedTrack && confirm(`Удалить "${selectedTrack.name}" с телефона?`)) {
-                        // Здесь будет вызов MediaStore для удаления
                         alert('Функция удаления будет доступна в следующей версии');
                     }
                     break;
@@ -968,7 +1152,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!selectedTrack?.data) return;
             
             try {
-                // Здесь будет вызов MediaStore для обновления тегов
                 alert('Сохранение тегов будет доступно в следующей версии');
                 editTagsModal.classList.remove('active');
             } catch (e) {
@@ -1068,7 +1251,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (shareMethod === 'system') {
                 if (selectedTrack?.data?.uri) {
-                    // Здесь будет вызов системного шаринга
                     alert(`Системное меню шаринга для "${trackName}"`);
                 }
             } else {
@@ -1082,93 +1264,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeShareModal) {
         closeShareModal.addEventListener('click', () => {
             shareModal.classList.remove('active');
-        });
-    }
-
-    // ========== НАВИГАЦИЯ ==========
-    if (musicBtn) {
-        musicBtn.addEventListener('click', () => {
-            pageMain.classList.remove('active-page');
-            pageMusic.classList.add('active-page');
-        });
-    }
-
-    if (backToMain) {
-        backToMain.addEventListener('click', () => {
-            pageMusic.classList.remove('active-page');
-            pageMain.classList.add('active-page');
-        });
-    }
-
-    // ========== ПОИСК ==========
-    if (searchToggle) {
-        searchToggle.addEventListener('click', () => {
-            searchBar.classList.toggle('hidden');
-            if (!searchBar.classList.contains('hidden')) {
-                searchInput.focus();
-            }
-        });
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-
-            const activeTab = document.querySelector('.tab-pane.active-pane');
-            if (!activeTab) return;
-
-            const mediaItems = activeTab.querySelectorAll('.media-item, .folder-item, .playlist-item');
-
-            mediaItems.forEach(item => {
-                const name = item.querySelector('.name')?.textContent.toLowerCase() || '';
-                if (query === '' || name.includes(query)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    }
-
-    if (searchClear) {
-        searchClear.addEventListener('click', () => {
-            searchInput.value = '';
-
-            const activeTab = document.querySelector('.tab-pane.active-pane');
-            if (activeTab) {
-                const mediaItems = activeTab.querySelectorAll('.media-item, .folder-item, .playlist-item');
-                mediaItems.forEach(item => {
-                    item.style.display = 'flex';
-                });
-            }
-
-            searchInput.focus();
-        });
-    }
-
-    // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
-    if (tabItems.length > 0) {
-        tabItems.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabItems.forEach(t => t.classList.remove('active-tab'));
-                tab.classList.add('active-tab');
-
-                const tabName = tab.getAttribute('data-tab');
-
-                document.querySelectorAll('.tab-pane').forEach(pane => {
-                    pane.classList.remove('active-pane');
-                });
-
-                const activePane = document.getElementById(`tab-${tabName}`);
-                if (activePane) {
-                    activePane.classList.add('active-pane');
-                }
-
-                if (searchBar) {
-                    searchBar.classList.add('hidden');
-                    if (searchInput) searchInput.value = '';
-                }
-            });
         });
     }
 
