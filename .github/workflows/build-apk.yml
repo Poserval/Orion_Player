@@ -30,10 +30,15 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Add Android platform
+      - name: Initialize Capacitor
         run: |
-          npx cap init OrionPlayer com.orion.player --webDir=. --skip-npm
+          # Удаляем старый android если есть
+          rm -rf android
+          # Инициализируем правильно
+          npx cap init OrionPlayer com.orion.player
+          # Добавляем android платформу
           npx cap add android
+          # Копируем файлы
           npx cap copy
           npx cap sync
 
