@@ -64,10 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const cutTrackModal = document.getElementById('cut-track-modal');
     const closeCutModal = document.getElementById('close-cut-modal');
     const saveCutBtn = document.getElementById('save-cut-btn');
-    const startSlider = document.getElementById('start-slider');
-    const endSlider = document.getElementById('end-slider');
-    const startTime = document.getElementById('start-time');
-    const endTime = document.getElementById('end-time');
+    const selectFullTrack = document.getElementById('select-full-track');
+    const exactStart = document.getElementById('exact-start');
+    const exactEnd = document.getElementById('exact-end');
+    const currentPosition = document.getElementById('current-position');
+    const startPlus = document.getElementById('start-plus');
+    const endPlus = document.getElementById('end-plus');
     
     const addToPlaylistModal = document.getElementById('add-to-playlist-modal');
     const closePlaylistSelect = document.getElementById('close-playlist-select');
@@ -94,7 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Переключение на страницу Музыка
     if (musicBtn) {
         musicBtn.addEventListener('click', () => {
-            console.log('Музыка нажата');
             pageMain.classList.remove('active-page');
             pageMusic.classList.add('active-page');
         });
@@ -103,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Возврат на главную
     if (backToMain) {
         backToMain.addEventListener('click', () => {
-            console.log('Назад на главную');
             pageMusic.classList.remove('active-page');
             pageMain.classList.add('active-page');
         });
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ========== МЕНЮ ТРЕКА ==========
     document.querySelectorAll('.track-menu-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Не запускаем воспроизведение
+            e.stopPropagation();
             
             const mediaItem = btn.closest('.media-item, .folder-item, .playlist-item');
             const trackName = mediaItem.querySelector('.name')?.textContent || 'Трек';
@@ -281,19 +281,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Закрытие меню трека
     if (closeTrackMenu) {
         closeTrackMenu.addEventListener('click', () => {
             trackMenuModal.classList.remove('active');
         });
     }
 
-    // Обработка пунктов меню
     document.querySelectorAll('.track-menu-item').forEach(item => {
         item.addEventListener('click', (e) => {
             const action = item.getAttribute('data-action');
             
-            // Закрываем меню трека
             trackMenuModal.classList.remove('active');
             
             switch(action) {
@@ -309,31 +306,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'set-ringtone':
                     if (selectedTrack) {
                         alert(`"${selectedTrack.name}" установлен как рингтон`);
-                        // Здесь будет реальная установка рингтона через Capacitor
                     }
                     break;
                 case 'edit-tags':
                     if (editTagsModal) {
-                        // Заполняем поля текущими значениями (заглушка)
                         document.getElementById('edit-title').value = selectedTrack?.name || '';
                         editTagsModal.classList.add('active');
                     }
                     break;
                 case 'cut-track':
                     if (cutTrackModal) {
-                        document.getElementById('cut-track-name').textContent = selectedTrack?.name || '';
-                        // Сброс слайдеров
-                        if (startSlider) startSlider.value = 0;
-                        if (endSlider) endSlider.value = 100;
-                        if (startTime) startTime.textContent = '0:00';
-                        if (endTime) endTime.textContent = '3:45'; // Заглушка
+                        document.getElementById('cut-track-title').textContent = selectedTrack?.name || 'Трек';
                         cutTrackModal.classList.add('active');
                     }
                     break;
                 case 'delete':
                     if (selectedTrack && confirm(`Удалить "${selectedTrack.name}" с телефона?`)) {
                         selectedTrack.element.remove();
-                        console.log('Трек удален');
                     }
                     break;
             }
@@ -361,21 +350,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ========== ОБРЕЗКА ТРЕКА ==========
-    if (startSlider) {
-        startSlider.addEventListener('input', (e) => {
-            const val = e.target.value;
-            const minutes = Math.floor(val / 20);
-            const seconds = Math.floor((val % 20) * 3);
-            startTime.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    if (selectFullTrack) {
+        selectFullTrack.addEventListener('click', () => {
+            if (exactStart) exactStart.textContent = '00:00.0';
+            if (exactEnd) exactEnd.textContent = '04:08.0';
+            if (currentPosition) currentPosition.textContent = '00:00.0';
         });
     }
 
-    if (endSlider) {
-        endSlider.addEventListener('input', (e) => {
-            const val = e.target.value;
-            const minutes = Math.floor(val / 20);
-            const seconds = Math.floor((val % 20) * 3);
-            endTime.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    if (startPlus) {
+        startPlus.addEventListener('click', () => {
+            if (exactStart) {
+                let time = exactStart.textContent;
+                // Увеличиваем на 1 секунду (упрощенно)
+                exactStart.textContent = '00:16.0';
+                if (currentPosition) currentPosition.textContent = '00:16.0';
+            }
+        });
+    }
+
+    if (endPlus) {
+        endPlus.addEventListener('click', () => {
+            if (exactEnd) {
+                let time = exactEnd.textContent;
+                // Увеличиваем на 1 секунду (упрощенно)
+                exactEnd.textContent = '01:00.9';
+                if (currentPosition) currentPosition.textContent = '01:00.9';
+            }
         });
     }
 
@@ -387,8 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (saveCutBtn) {
         saveCutBtn.addEventListener('click', () => {
-            const start = startTime.textContent;
-            const end = endTime.textContent;
+            const start = exactStart?.textContent || '00:00';
+            const end = exactEnd?.textContent || '00:00';
             alert(`Отрезок сохранен (${start} - ${end})`);
             cutTrackModal.classList.remove('active');
         });
@@ -421,7 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const trackName = selectedTrack?.name || 'трек';
             
             if (shareMethod === 'system') {
-                // Здесь будет вызов системного меню шаринга
                 alert(`Системное меню шаринга для "${trackName}"`);
             } else {
                 alert(`Поделиться "${trackName}" через ${shareMethod}`);
@@ -598,8 +598,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function playMedia(file) {
-        console.log('Воспроизведение:', file.name);
-        
         if (currentAudio) {
             currentAudio.pause();
             currentAudio = null;
@@ -624,28 +622,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 isPlaying = true;
                 miniPlayPause.textContent = '⏸';
             })
-            .catch(e => {
-                console.error('Ошибка воспроизведения:', e);
-            });
+            .catch(e => console.error('Ошибка воспроизведения:', e));
     }
 
-    // Обработчики кликов на медиа-элементы (но не на кнопку меню)
     document.querySelectorAll('.media-item, .folder-item, .playlist-item').forEach(item => {
         item.addEventListener('click', (e) => {
-            // Если кликнули на кнопку меню - не запускаем воспроизведение
             if (e.target.closest('.track-menu-btn')) return;
             
             const icon = item.querySelector('.icon')?.textContent || '🎵';
             const name = item.querySelector('.name')?.textContent || '';
             
-            let type = 'audio';
-            if (icon.includes('🎬')) type = 'video';
-            
-            playMedia({ name, icon, type, path: name });
+            playMedia({ name, icon, type: 'audio', path: name });
         });
     });
 
-    // Управление мини-плеером
     if (miniPlayPause) {
         miniPlayPause.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -690,7 +680,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Выход из полноэкранного плеера
     function exitPlayer() {
         if (playerScreen && playerScreen.style.display === 'block') {
             playerScreen.style.display = 'none';
@@ -703,12 +692,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('backbutton', exitPlayer, false);
 
-    // Тап по видео/аудио для паузы/плей
     if (videoPlayer) {
         videoPlayer.addEventListener('click', (e) => {
             e.preventDefault();
             if (videoPlayer.paused) {
-                videoPlayer.play().catch(e => console.log('Ошибка воспроизведения'));
+                videoPlayer.play();
             } else {
                 videoPlayer.pause();
             }
@@ -719,7 +707,7 @@ document.addEventListener('DOMContentLoaded', () => {
         audioPlayer.addEventListener('click', (e) => {
             e.preventDefault();
             if (audioPlayer.paused) {
-                audioPlayer.play().catch(e => console.log('Ошибка воспроизведения'));
+                audioPlayer.play();
             } else {
                 audioPlayer.pause();
             }
@@ -775,6 +763,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
-    console.log('Скрипт загружен полностью');
 });
