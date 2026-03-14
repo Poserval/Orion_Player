@@ -30,15 +30,28 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
+      - name: Prepare web directory
+        run: |
+          # Создаём папку www для веб-файлов
+          mkdir -p www
+          # Копируем все нужные файлы в www
+          cp index.html www/
+          cp style.css www/
+          cp script.js www/
+          cp -r assets www/
+
       - name: Initialize Capacitor
         run: |
-          # Удаляем старый android если есть
+          # Удаляем старую android папку, если есть
           rm -rf android
-          # Инициализируем правильно
+          # Инициализируем, указывая правильный webDir
           npx cap init OrionPlayer com.orion.player
-          # Добавляем android платформу
+          # Устанавливаем правильный webDir в конфиге
+          sed -i 's/"webDir": "."/"webDir": "www"/' capacitor.config.json
+
+      - name: Add Android platform
+        run: |
           npx cap add android
-          # Копируем файлы
           npx cap copy
           npx cap sync
 
