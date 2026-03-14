@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerProgressFill = document.getElementById('player-progress-fill');
     const playerProgressHandle = document.getElementById('player-progress-handle');
     const playerProgressBar = document.getElementById('player-progress-bar');
+    const playerLike = document.getElementById('player-like');
+    const playerMenu = document.getElementById('player-menu');
+    const playerPlaylist = document.getElementById('player-playlist');
+    const playerDevices = document.getElementById('player-devices');
     
     // Элементы страниц
     const pageMain = document.getElementById('page-main');
@@ -184,7 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function initApp() {
         console.log('Инициализация приложения...');
         
-        // Проверяем кэш
         const cachedTime = localStorage.getItem(CACHE_KEYS.TIMESTAMP);
         const now = Date.now();
         
@@ -764,31 +767,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentAudio = null;
             }
 
-            // КОНВЕРТИРУЕМ URI В ДОСТУПНЫЙ ДЛЯ WEBVIEW URL
             let playableUrl;
-            
             if (typeof Capacitor !== 'undefined') {
-                if (file.uri.startsWith('content://')) {
-                    playableUrl = Capacitor.convertFileSrc(file.uri);
-                } else {
-                    playableUrl = Capacitor.convertFileSrc(file.uri);
-                }
+                playableUrl = Capacitor.convertFileSrc(file.uri);
             } else {
                 playableUrl = file.uri;
             }
             
             console.log('Playable URL:', playableUrl);
             
-            // Создаем новый Audio объект
             currentAudio = new Audio(playableUrl);
             currentTrack = file;
 
-            // Обновляем мини-плеер
             miniIcon.textContent = '🎵';
             miniTrackName.textContent = file.displayName || file.title || 'Трек';
             miniPlayer.classList.remove('hidden');
 
-            // Обработчики событий
             currentAudio.addEventListener('timeupdate', updateMiniPlayerTime);
             
             currentAudio.addEventListener('loadedmetadata', () => {
@@ -799,39 +793,19 @@ document.addEventListener('DOMContentLoaded', () => {
             currentAudio.addEventListener('ended', () => {
                 isPlaying = false;
                 miniPlayPause.textContent = '▶';
+                if (playerPlayPause) playerPlayPause.textContent = '▶';
             });
             
             currentAudio.addEventListener('error', (e) => {
                 console.error('Ошибка воспроизведения:', e);
-                console.error('Код ошибки:', currentAudio.error ? currentAudio.error.code : 'unknown');
                 
                 if (currentAudio.error && currentAudio.error.code === 4) {
                     openFullscreenPlayer(file, 0);
                 } else {
-                    let errorMessage = 'Не удалось воспроизвести файл. ';
-                    if (currentAudio.error) {
-                        switch(currentAudio.error.code) {
-                            case MediaError.MEDIA_ERR_ABORTED:
-                                errorMessage += 'Воспроизведение прервано.';
-                                break;
-                            case MediaError.MEDIA_ERR_NETWORK:
-                                errorMessage += 'Сетевая ошибка.';
-                                break;
-                            case MediaError.MEDIA_ERR_DECODE:
-                                errorMessage += 'Формат не поддерживается или файл поврежден.';
-                                break;
-                            case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                                errorMessage += 'Формат не поддерживается браузером.';
-                                break;
-                            default:
-                                errorMessage += 'Неизвестная ошибка.';
-                        }
-                    }
-                    alert(errorMessage);
+                    alert('Не удалось воспроизвести файл. Формат не поддерживается.');
                 }
             });
 
-            // Запускаем
             currentAudio.play()
                 .then(() => {
                     isPlaying = true;
@@ -843,14 +817,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     if (e.name === 'NotSupportedError') {
                         openFullscreenPlayer(file, 0);
-                    } else {
-                        alert('Не удалось воспроизвести файл: ' + e.message);
                     }
                 });
 
         } catch (e) {
             console.error('Критическая ошибка в playMedia:', e);
-            alert('Ошибка при подготовке воспроизведения: ' + e.message);
         }
     }
 
@@ -861,7 +832,6 @@ document.addEventListener('DOMContentLoaded', () => {
         playerScreen.style.display = 'block';
         app.style.display = 'none';
         
-        // Обновляем информацию о треке
         playerTrackName.textContent = file.displayName || file.title || 'Без названия';
         playerTrackArtist.textContent = file.artist || 'Неизвестный исполнитель';
         
@@ -888,7 +858,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (subtitleBtn) subtitleBtn.style.display = 'none';
         }
         
-        // Синхронизируем с currentAudio
         if (currentAudio) {
             currentAudio.pause();
         }
@@ -896,13 +865,14 @@ document.addEventListener('DOMContentLoaded', () => {
         currentTrack = file;
         isPlaying = true;
         
-        // Обновляем кнопку play/pause
         if (playerPlayPause) playerPlayPause.textContent = '⏸';
         
-        // Обновляем длительность
         if (file.duration) {
             playerDuration.textContent = formatDuration(file.duration);
         }
+        
+        // Добавляем обработчик времени для обновления прогресса
+        currentAudio.addEventListener('timeupdate', updateFullscreenProgress);
     }
 
     function updateMiniPlayerTime() {
@@ -910,11 +880,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const current = formatTime(currentAudio.currentTime);
             const duration = formatTime(currentAudio.duration);
             miniTime.textContent = `${current} / ${duration}`;
-            
-            // Обновляем прогресс в полноэкранном плеере, если он открыт
-            if (playerScreen.style.display === 'block') {
-                updateFullscreenProgress();
-            }
         }
     }
 
@@ -925,7 +890,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             playerCurrentTime.textContent = formatTime(current);
             
-            if (duration && duration > 0) {
+            if (duration && duration > 0 && isFinite(duration)) {
                 const percent = (current / duration) * 100;
                 playerProgressFill.style.width = `${percent}%`;
                 playerProgressHandle.style.left = `${percent}%`;
@@ -942,10 +907,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (isPlaying) {
                     currentAudio.pause();
                     miniPlayPause.textContent = '▶';
+                    if (playerPlayPause) playerPlayPause.textContent = '▶';
                 } else {
                     currentAudio.play()
                         .then(() => {
                             miniPlayPause.textContent = '⏸';
+                            if (playerPlayPause) playerPlayPause.textContent = '⏸';
                         })
                         .catch(e => console.error('Ошибка при возобновлении:', e));
                 }
@@ -987,15 +954,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (playerPrev) {
         playerPrev.addEventListener('click', () => {
-            // В следующей версии - переключение на предыдущий трек
-            console.log('Предыдущий трек');
+            console.log('Предыдущий трек - в разработке');
         });
     }
 
     if (playerNext) {
         playerNext.addEventListener('click', () => {
-            // В следующей версии - переключение на следующий трек
-            console.log('Следующий трек');
+            console.log('Следующий трек - в разработке');
         });
     }
 
@@ -1025,6 +990,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentAudio.currentTime = newTime;
                 updateFullscreenProgress();
             }
+        });
+    }
+
+    if (playerLike) {
+        playerLike.addEventListener('click', () => {
+            console.log('Лайк - в разработке');
+        });
+    }
+
+    if (playerMenu) {
+        playerMenu.addEventListener('click', () => {
+            if (selectedTrack) {
+                trackMenuModal.classList.add('active');
+            }
+        });
+    }
+
+    if (playerPlaylist) {
+        playerPlaylist.addEventListener('click', () => {
+            console.log('Плейлист - в разработке');
+        });
+    }
+
+    if (playerDevices) {
+        playerDevices.addEventListener('click', () => {
+            console.log('Устройства - в разработке');
         });
     }
 
