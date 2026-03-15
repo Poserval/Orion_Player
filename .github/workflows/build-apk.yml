@@ -13,11 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -27,42 +22,13 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps
-
-      - name: Prepare web directory
-        run: |
-          mkdir -p www
-          cp index.html www/
-          cp style.css www/
-          cp script.js www/
-          cp -r assets www/
-
-      - name: Update webDir in config
-        run: |
-          # Заменяем webDir на www
-          sed -i 's/"webDir": "."/"webDir": "www"/' capacitor.config.json
-
-      - name: Initialize Capacitor
-        run: |
-          # Инициализируем без флагов
-          npx cap init OrionPlayer com.orion.player
-
-      - name: Add Android platform
-        run: |
-          npx cap add android
-          npx cap copy
-          npx cap sync
-
       - name: Build APK
         run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
+          # Здесь будет сборка Kotlin проекта
+          # Пока пусто
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: orion-player-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
