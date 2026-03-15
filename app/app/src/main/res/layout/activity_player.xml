@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0A0C10">
+
+    <!-- Шапка с нашей иконкой -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/icon_header"
+        android:adjustViewBounds="true"/>
+
+    <!-- Сам плеер (системные контролы будут видны) -->
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="16dp"
+        app:show_buffering="when_playing"
+        app:use_controller="true" />
+
+    <!-- Тестовый список файлов (потом заменим на настоящий) -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ТЕСТОВЫЕ ФАЙЛЫ"
+        android:textColor="#A0B8E0"
+        android:padding="16dp"
+        android:textSize="14sp"/>
+
+    <ListView
+        android:id="@+id/file_list"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="#1A1F2E"
+        android:divider="#2E3A48"
+        android:dividerHeight="1dp"/>
+</LinearLayout>
