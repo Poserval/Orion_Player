@@ -36,5 +36,12 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    
+    // ExoPlayer (официальный плеер от Google)
+    implementation 'androidx.media3:media3-exoplayer:1.4.0'
+    implementation 'androidx.media3:media3-ui:1.4.0'
+    implementation 'androidx.media3:media3-session:1.4.0'
+    
+    // Для работы с картинками (наши иконки)
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
 }
